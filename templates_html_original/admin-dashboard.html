@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin - SIADU SMKN 2 Karanganyar</title>
+  <meta name="description" content="Dashboard Pengelolaan dan Verifikasi SIADU SMK Negeri 2 Karanganyar">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+  <!-- Shared Data Store -->
+  <script src="pengaduan-store.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#0a1120',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased font-sans selection:bg-blue-600 selection:text-white min-h-screen flex flex-col justify-between" x-data="adminApp()">
+
+  <!-- Top Admin Bar -->
+  <header class="bg-[#0f1f38] text-white sticky top-0 z-40 border-b border-slate-800 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex items-center justify-between">
+      
+      <!-- Brand & Admin Badge -->
+      <div class="flex items-center gap-3.5">
+        <a href="index.html" class="flex items-center gap-3">
+          <img 
+            src="https://smkn2kra.sch.id/images/logo-smkn2kra.png" 
+            alt="Logo SMKN 2 Kra" 
+            class="h-10 w-auto"
+            onerror="this.onerror=null; this.src='https://placehold.co/120x120/1e293b/ffffff?text=SMKN+2+KRA';"
+          >
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-extrabold tracking-tight text-white">SIADU</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-600 text-white uppercase tracking-wider">PANEL ADMIN</span>
+            </div>
+            <div class="text-[11px] text-blue-200">SMK Negeri 2 Karanganyar</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Quick Nav & Admin User Profile -->
+      <div class="flex items-center gap-4 text-xs font-semibold">
+        <a href="petugas-dashboard.html" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition">
+          <i class="fa-solid fa-wrench text-emerald-400"></i> Mode Petugas
+        </a>
+        <a href="index.html" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition">
+          <i class="fa-solid fa-arrow-up-right-from-square text-amber-400"></i> Portal Publik
+        </a>
+
+        <!-- Admin Profile -->
+        <div class="flex items-center gap-3 pl-2 border-l border-white/10">
+          <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+            AD
+          </div>
+          <div class="hidden md:block text-left leading-tight">
+            <span class="block text-xs font-bold text-white">Haryanto, S.Pd</span>
+            <span class="block text-[10px] text-slate-400">Verifikator Sarpras & IT</span>
+          </div>
+          <a href="login.html" class="p-1.5 text-slate-400 hover:text-white transition" title="Keluar">
+            <i class="fa-solid fa-right-from-bracket text-sm"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sub Header / Breadcrumb -->
+  <div class="bg-white border-b border-slate-200 py-3 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h1 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-blue-600"></i>
+          Alur Admin SIADU: Verifikasi & Penugasan Unit
+        </h1>
+        <p class="text-xs text-slate-500">Tentukan kategori, validasi tingkat urgensi, delegasikan tugas ke unit berwenang, dan pantau SLA.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button @click="resetToDefault()" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-600 text-xs font-medium transition flex items-center gap-1.5" title="Reset data mockup ke kondisi awal">
+          <i class="fa-solid fa-rotate-right text-xs"></i> Reset Data Demo
+        </button>
+        <a href="buat-pengaduan.html" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-plus"></i> Tes Form Pelapor
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1 space-y-6">
+
+    <!-- KPI Metric Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <!-- 1 -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-slate-500 uppercase">Total Masuk</span>
+          <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-xs"><i class="fa-solid fa-inbox"></i></span>
+        </div>
+        <div class="text-2xl font-black text-slate-900" x-text="stats.total">0</div>
+        <div class="text-[11px] text-slate-400 mt-1">Seluruh aduan sistem</div>
+      </div>
+
+      <!-- 2 -->
+      <div class="bg-white p-5 rounded-2xl border border-amber-200 bg-amber-50/30 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-amber-700 uppercase">Perlu Verifikasi</span>
+          <span class="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center text-xs"><i class="fa-solid fa-clipboard-question"></i></span>
+        </div>
+        <div class="text-2xl font-black text-amber-600" x-text="stats.masuk">0</div>
+        <div class="text-[11px] text-amber-700 font-medium mt-1">Menunggu penetapan unit</div>
+      </div>
+
+      <!-- 3 -->
+      <div class="bg-white p-5 rounded-2xl border border-blue-200 bg-blue-50/30 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-blue-700 uppercase">Sedang Diproses</span>
+          <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center text-xs"><i class="fa-solid fa-person-digging"></i></span>
+        </div>
+        <div class="text-2xl font-black text-blue-600" x-text="stats.proses">0</div>
+        <div class="text-[11px] text-blue-700 font-medium mt-1">Pengerjaan teknisi/unit</div>
+      </div>
+
+      <!-- 4 -->
+      <div class="bg-white p-5 rounded-2xl border border-teal-200 bg-teal-50/30 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-teal-700 uppercase">Perlu Ditinjau</span>
+          <span class="w-7 h-7 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center text-xs"><i class="fa-solid fa-file-circle-check"></i></span>
+        </div>
+        <div class="text-2xl font-black text-teal-600" x-text="stats.konfirmasi">0</div>
+        <div class="text-[11px] text-teal-700 font-medium mt-1">Petugas ajukan selesai</div>
+      </div>
+
+      <!-- 5 -->
+      <div class="bg-white p-5 rounded-2xl border border-emerald-200 bg-emerald-50/30 shadow-sm col-span-2 sm:col-span-1">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-emerald-700 uppercase">Selesai Tuntas</span>
+          <span class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs"><i class="fa-solid fa-circle-check"></i></span>
+        </div>
+        <div class="text-2xl font-black text-emerald-600" x-text="stats.selesai">0</div>
+        <div class="text-[11px] text-emerald-700 font-medium mt-1">Tiket ditutup resmi</div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <!-- Search Input -->
+      <div class="relative flex-1">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+          <i class="fa-solid fa-search text-xs"></i>
+        </span>
+        <input 
+          type="text" 
+          x-model="searchQuery" 
+          placeholder="Cari nomor tiket, judul pengaduan, nama pelapor, atau lokasi..." 
+          class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-blue-600 bg-slate-50 focus:bg-white"
+        >
+      </div>
+
+      <!-- Status Filter -->
+      <div class="flex flex-wrap items-center gap-2">
+        <select x-model="filterStatus" class="px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 bg-slate-50 focus:bg-white focus:outline-none">
+          <option value="all">Semua Status</option>
+          <option value="masuk">Menunggu Verifikasi</option>
+          <option value="terverifikasi">Terverifikasi (Ditugaskan)</option>
+          <option value="dalam_proses">Sedang Ditangani</option>
+          <option value="menunggu_konfirmasi">Menunggu Review Selesai</option>
+          <option value="selesai">Selesai</option>
+        </select>
+
+        <select x-model="filterKategori" class="px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 bg-slate-50 focus:bg-white focus:outline-none">
+          <option value="all">Semua Kategori</option>
+          <option value="Sarana dan prasarana">Sarana & Prasarana</option>
+          <option value="Pembelajaran dan akademik">Pembelajaran & Akademik</option>
+          <option value="Layanan administrasi">Layanan Administrasi</option>
+          <option value="Perlindungan warga sekolah">Perlindungan Warga</option>
+          <option value="Saran dan aspirasi">Saran & Aspirasi</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Table of Complaints -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-bold text-slate-900">Daftar Antrean Pengaduan</span>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 font-bold text-slate-600" x-text="filteredReports.length + ' data'"></span>
+        </div>
+        <span class="text-xs text-slate-400">Klik tombol aksi untuk memproses aduan</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+              <th class="py-3 px-4">Tiket & Tanggal</th>
+              <th class="py-3 px-4">Pelapor & Lokasi</th>
+              <th class="py-3 px-4">Rincian Pengaduan</th>
+              <th class="py-3 px-4">Urgensi & Kategori</th>
+              <th class="py-3 px-4">Status & Unit</th>
+              <th class="py-3 px-4 text-center">Tenggat SLA</th>
+              <th class="py-3 px-4 text-right">Aksi Admin</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <template x-for="r in filteredReports" :key="r.id">
+              <tr class="hover:bg-blue-50/40 transition">
+                
+                <!-- 1. Tiket -->
+                <td class="py-3.5 px-4 font-mono">
+                  <a :href="'lacak-pengaduan.html?ticket=' + r.id" class="font-bold text-blue-700 hover:underline block" x-text="'#' + r.id"></a>
+                  <span class="text-[11px] text-slate-400" x-text="r.tanggalLapor"></span>
+                </td>
+
+                <!-- 2. Pelapor & Lokasi -->
+                <td class="py-3.5 px-4">
+                  <span class="font-bold text-slate-800 block" x-text="r.namaPelapor"></span>
+                  <span class="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                    <i class="fa-solid fa-location-dot text-slate-400"></i>
+                    <span class="truncate max-w-[150px]" x-text="r.lokasi || '-'"></span>
+                  </span>
+                </td>
+
+                <!-- 3. Rincian Pengaduan -->
+                <td class="py-3.5 px-4 max-w-xs">
+                  <span class="font-bold text-slate-900 block truncate" x-text="r.judul"></span>
+                  <p class="text-[11px] text-slate-500 line-clamp-1 mt-0.5" x-text="r.uraian"></p>
+                </td>
+
+                <!-- 4. Urgensi & Kategori -->
+                <td class="py-3.5 px-4">
+                  <span 
+                    class="inline-block px-2 py-0.5 rounded text-[10px] font-bold mb-1"
+                    :class="{
+                      'bg-blue-100 text-blue-800': (r.urgensiAdmin || r.urgensiPelapor) === 'Normal',
+                      'bg-amber-100 text-amber-800': (r.urgensiAdmin || r.urgensiPelapor) === 'Mendesak',
+                      'bg-rose-100 text-rose-800': (r.urgensiAdmin || r.urgensiPelapor) === 'Ada risiko keselamatan'
+                    }"
+                    x-text="r.urgensiAdmin || r.urgensiPelapor"
+                  ></span>
+                  <span class="block text-[11px] text-slate-500 truncate max-w-[130px]" x-text="r.kategori"></span>
+                </td>
+
+                <!-- 5. Status & Unit -->
+                <td class="py-3.5 px-4">
+                  <span 
+                    class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                    :class="{
+                      'bg-amber-100 text-amber-800': r.status === 'masuk',
+                      'bg-blue-100 text-blue-800': r.status === 'terverifikasi',
+                      'bg-purple-100 text-purple-800': r.status === 'dalam_proses',
+                      'bg-teal-100 text-teal-800': r.status === 'menunggu_konfirmasi',
+                      'bg-emerald-100 text-emerald-800': r.status === 'selesai'
+                    }"
+                    x-text="formatStatus(r.status)"
+                  ></span>
+                  <span class="block text-[11px] text-slate-600 font-medium mt-0.5" x-text="r.unitTujuan || 'Belum ditugaskan'"></span>
+                </td>
+
+                <!-- 6. Tenggat SLA -->
+                <td class="py-3.5 px-4 text-center">
+                  <template x-if="r.deadline">
+                    <div>
+                      <span class="text-xs font-bold text-slate-800 block" x-text="r.deadline"></span>
+                      <span class="text-[10px] font-semibold text-emerald-600" x-show="r.status === 'selesai'">Selesai</span>
+                      <span class="text-[10px] font-semibold text-amber-600" x-show="r.status !== 'selesai'">Pantau SLA</span>
+                    </div>
+                  </template>
+                  <template x-if="!r.deadline">
+                    <span class="text-slate-400 text-xs">-</span>
+                  </template>
+                </td>
+
+                <!-- 7. Aksi -->
+                <td class="py-3.5 px-4 text-right">
+                  <!-- Case 1: Laporan Masuk Baru (Butuh Verifikasi & Penugasan) -->
+                  <template x-if="r.status === 'masuk'">
+                    <button @click="openAssignModal(r)" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition inline-flex items-center gap-1.5">
+                      <i class="fa-solid fa-user-plus text-[10px]"></i> Verifikasi & Tugaskan
+                    </button>
+                  </template>
+
+                  <!-- Case 2: Petugas Selesai (Butuh Pemeriksaan Kelengkapan) -->
+                  <template x-if="r.status === 'menunggu_konfirmasi'">
+                    <button @click="openReviewModal(r)" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-sm transition inline-flex items-center gap-1.5">
+                      <i class="fa-solid fa-check-double text-[10px]"></i> Periksa Hasil
+                    </button>
+                  </template>
+
+                  <!-- Case 3: Sedang Dikerjakan / Selesai (Detail) -->
+                  <template x-if="r.status !== 'masuk' && r.status !== 'menunggu_konfirmasi'">
+                    <a :href="'lacak-pengaduan.html?ticket=' + r.id" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition inline-flex items-center gap-1.5">
+                      <i class="fa-solid fa-eye text-[10px]"></i> Detail
+                    </a>
+                  </template>
+                </td>
+
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL 1: VERIFIKASI & TUGASKAN UNIT (Step Alur Admin) -->
+  <div x-show="showAssignModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 transform transition-all text-left">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-5">
+        <div>
+          <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Verifikasi Laporan Masuk</span>
+          <h3 class="text-lg font-black text-slate-900 mt-0.5">Penetapan Kategori, Urgensi & Penugasan Unit</h3>
+        </div>
+        <button @click="showAssignModal = false" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Detail Ringkas Laporan Yang Masuk -->
+      <template x-if="selectedTicket">
+        <div class="space-y-5">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono font-bold text-blue-700" x-text="'#' + selectedTicket.id"></span>
+              <span class="text-slate-400" x-text="selectedTicket.tanggalLapor"></span>
+            </div>
+            <div>
+              <span class="font-bold text-slate-900 text-sm block" x-text="selectedTicket.judul"></span>
+              <p class="text-slate-600 mt-1 italic" x-text="'“' + selectedTicket.uraian + '”'"></p>
+            </div>
+            <div class="pt-2 border-t border-slate-200 flex flex-wrap gap-4 text-slate-500">
+              <span>Pelapor: <strong class="text-slate-700" x-text="selectedTicket.namaPelapor"></strong></span>
+              <span>Lokasi: <strong class="text-slate-700" x-text="selectedTicket.lokasi"></strong></span>
+              <span>Urgensi Pelapor: <strong class="text-amber-700" x-text="selectedTicket.urgensiPelapor"></strong></span>
+            </div>
+          </div>
+
+          <!-- Form Penugasan Admin -->
+          <form @submit.prevent="submitAssignment()" class="space-y-4">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Koreksi / Konfirmasi Kategori Definitif -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Kategori Definitif</label>
+                <select x-model="assignForm.kategoriDefinitif" class="w-full p-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-600 bg-white">
+                  <option value="Sarana dan prasarana">Sarana dan prasarana</option>
+                  <option value="Pembelajaran dan akademik">Pembelajaran dan akademik</option>
+                  <option value="Layanan administrasi">Layanan administrasi</option>
+                  <option value="Perlindungan warga sekolah">Perlindungan warga sekolah</option>
+                  <option value="Saran dan aspirasi">Saran dan aspirasi</option>
+                </select>
+              </div>
+
+              <!-- Penetapan Tingkat Urgensi Resmi -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Urgensi Resmi Sekolah</label>
+                <select x-model="assignForm.urgensiAdmin" class="w-full p-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-600 bg-white">
+                  <option value="Normal">Normal (SLA 3 Hari)</option>
+                  <option value="Mendesak">Mendesak (SLA 24 Jam)</option>
+                  <option value="Ada risiko keselamatan">Risiko Keselamatan (SLA Segera)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Pilih Unit Kerja Tujuan -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Tugaskan ke Unit</label>
+                <select x-model="assignForm.unitTujuan" @change="updatePetugasOptions()" class="w-full p-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-600 bg-white" required>
+                  <option value="Unit Sarana dan Prasarana (Listrik & Gedung)">Unit Sarpras (Listrik & Gedung)</option>
+                  <option value="Unit IT & Lab Komputer">Unit IT & Lab Komputer</option>
+                  <option value="Unit Kesiswaan & Bimbingan Konseling (BK)">Unit Kesiswaan & Tim BK</option>
+                  <option value="Unit Tata Usaha (TU) Administrasi">Unit Tata Usaha (TU)</option>
+                  <option value="Unit Kurikulum & Pembelajaran">Unit Kurikulum</option>
+                </select>
+              </div>
+
+              <!-- Pilih Petugas Lapangan Spesifik -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Petugas Penanggung Jawab</label>
+                <select x-model="assignForm.petugas" class="w-full p-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-600 bg-white" required>
+                  <option value="Joko Susilo, S.Kom (Teknisi Lab & IT)">Joko Susilo, S.Kom (Teknisi Lab & IT)</option>
+                  <option value="Slamet Raharjo (Teknisi Listrik & Sarpras)">Slamet Raharjo (Teknisi Listrik & Sarpras)</option>
+                  <option value="Mulyadi, S.Pd (Koordinator Kesiswaan & BK)">Mulyadi, S.Pd (Kesiswaan & BK)</option>
+                  <option value="Anita Rahmawati (Staf TU Bagian Siswa)">Anita Rahmawati (Staf TU)</option>
+                  <option value="Drs. Bambang Wijaya (Kepala Bengkel Mesin)">Drs. Bambang Wijaya (Bengkel Mesin)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Batas Waktu / Tenggat SLA -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Tenggat Waktu Penyelesaian (SLA)</label>
+              <input 
+                type="text" 
+                x-model="assignForm.deadline" 
+                placeholder="Contoh: 2026-10-18 14:00" 
+                class="w-full p-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-600 bg-white"
+                required
+              >
+              <div class="flex gap-2 mt-1.5">
+                <button type="button" @click="setDeadlineHours(24)" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700">+24 Jam</button>
+                <button type="button" @click="setDeadlineHours(48)" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700">+48 Jam</button>
+                <button type="button" @click="setDeadlineHours(72)" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700">+3 Hari</button>
+              </div>
+            </div>
+
+            <!-- Catatan Instruksi Admin -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Catatan & Instruksi Penugasan</label>
+              <textarea 
+                rows="2" 
+                x-model="assignForm.catatanAdmin" 
+                placeholder="Tuliskan arahan spesifik untuk petugas lapangan..."
+                class="w-full p-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-blue-600 bg-white"></textarea>
+            </div>
+
+            <!-- Tombol Simpan Penugasan -->
+            <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+              <button type="button" @click="showAssignModal = false" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">
+                Batal
+              </button>
+              <button type="submit" class="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-paper-plane"></i> Tetapkan & Kirim ke Petugas
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </template>
+
+    </div>
+  </div>
+
+  <!-- MODAL 2: PERIKSA KELENGKAPAN PENYELESAIAN (Step Alur Admin) -->
+  <div x-show="showReviewModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 transform transition-all text-left">
+      
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
+        <div>
+          <span class="text-xs font-bold text-teal-600 uppercase tracking-wider">Verifikasi Akhir Penyelesaian</span>
+          <h3 class="text-lg font-black text-slate-900 mt-0.5">Periksa Hasil Kerja & Tutup Tiket</h3>
+        </div>
+        <button @click="showReviewModal = false" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <template x-if="selectedTicket">
+        <div class="space-y-4">
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+            <span class="font-bold text-slate-900 text-sm block" x-text="selectedTicket.judul"></span>
+            <p class="text-slate-500">Petugas: <strong class="text-slate-700" x-text="selectedTicket.petugas"></strong></p>
+          </div>
+
+          <div>
+            <span class="text-xs font-bold text-slate-700 block mb-1">Catatan Tindakan Petugas:</span>
+            <div class="p-3 rounded-xl bg-teal-50 border border-teal-200 text-xs text-teal-900" x-text="selectedTicket.catatanPetugas"></div>
+          </div>
+
+          <!-- Bukti Foto Petugas -->
+          <div x-show="selectedTicket.buktiPetugas">
+            <span class="text-xs font-bold text-slate-700 block mb-1">Bukti Foto Penanganan Petugas:</span>
+            <img :src="selectedTicket.buktiPetugas" alt="Bukti Petugas" class="w-full h-48 object-cover rounded-xl border border-slate-200">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Catatan Penutupan Tiket Resmi</label>
+            <textarea 
+              rows="2" 
+              x-model="adminCloseFeedback" 
+              placeholder="Pekerjaan telah diverifikasi dan berfungsi baik sesuai standar SOP SMKN 2 Karanganyar."
+              class="w-full p-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-teal-500 bg-white"></textarea>
+          </div>
+
+          <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+            <button type="button" @click="showReviewModal = false" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">
+              Batal
+            </button>
+            <button type="button" @click="submitCloseTicket()" class="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-check"></i> Setujui & Tutup Tiket Resmi
+            </button>
+          </div>
+        </div>
+      </template>
+
+    </div>
+  </div>
+
+  <!-- Minimal Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    <p>&copy; 2026 SMK Negeri 2 Karanganyar • SIADU Dashboard Administrator</p>
+  </footer>
+
+  <script>
+    function adminApp() {
+      return {
+        reports: [],
+        searchQuery: '',
+        filterStatus: 'all',
+        filterKategori: 'all',
+        showAssignModal: false,
+        showReviewModal: false,
+        selectedTicket: null,
+        adminCloseFeedback: '',
+
+        assignForm: {
+          kategoriDefinitif: '',
+          urgensiAdmin: '',
+          unitTujuan: '',
+          petugas: '',
+          deadline: '',
+          catatanAdmin: ''
+        },
+
+        stats: {
+          total: 0,
+          masuk: 0,
+          proses: 0,
+          konfirmasi: 0,
+          selesai: 0
+        },
+
+        init() {
+          this.loadData();
+        },
+
+        loadData() {
+          this.reports = window.PengaduanDB.getAll();
+          this.computeStats();
+        },
+
+        computeStats() {
+          this.stats.total = this.reports.length;
+          this.stats.masuk = this.reports.filter(r => r.status === 'masuk').length;
+          this.stats.proses = this.reports.filter(r => ['terverifikasi', 'dalam_proses'].includes(r.status)).length;
+          this.stats.konfirmasi = this.reports.filter(r => r.status === 'menunggu_konfirmasi').length;
+          this.stats.selesai = this.reports.filter(r => r.status === 'selesai').length;
+        },
+
+        get filteredReports() {
+          return this.reports.filter(r => {
+            const matchStatus = this.filterStatus === 'all' || r.status === this.filterStatus;
+            const matchKategori = this.filterKategori === 'all' || r.kategori === this.filterKategori;
+            const q = this.searchQuery.toLowerCase();
+            const matchSearch = !this.searchQuery || 
+              r.id.toLowerCase().includes(q) || 
+              r.judul.toLowerCase().includes(q) || 
+              r.namaPelapor.toLowerCase().includes(q) || 
+              (r.lokasi && r.lokasi.toLowerCase().includes(q));
+            return matchStatus && matchKategori && matchSearch;
+          });
+        },
+
+        openAssignModal(ticket) {
+          this.selectedTicket = ticket;
+          this.assignForm.kategoriDefinitif = ticket.kategori;
+          this.assignForm.urgensiAdmin = ticket.urgensiPelapor || 'Normal';
+          this.assignForm.unitTujuan = 'Unit IT & Lab Komputer';
+          this.assignForm.petugas = 'Joko Susilo, S.Kom (Teknisi Lab & IT)';
+          this.setDeadlineHours(48);
+          this.assignForm.catatanAdmin = 'Segera lakukan perbaikan dan laporkan sebelum jadwal praktikum siswa.';
+          this.showAssignModal = true;
+        },
+
+        openReviewModal(ticket) {
+          this.selectedTicket = ticket;
+          this.adminCloseFeedback = 'Hasil pekerjaan telah diperiksa dan dinyatakan tuntas sesuai SOP SMKN 2 Karanganyar.';
+          this.showReviewModal = true;
+        },
+
+        updatePetugasOptions() {
+          if (this.assignForm.unitTujuan.includes('IT')) {
+            this.assignForm.petugas = 'Joko Susilo, S.Kom (Teknisi Lab & IT)';
+          } else if (this.assignForm.unitTujuan.includes('Sarana')) {
+            this.assignForm.petugas = 'Slamet Raharjo (Teknisi Listrik & Sarpras)';
+          } else if (this.assignForm.unitTujuan.includes('Kesiswaan')) {
+            this.assignForm.petugas = 'Mulyadi, S.Pd (Koordinator Kesiswaan & BK)';
+          } else if (this.assignForm.unitTujuan.includes('Tata Usaha')) {
+            this.assignForm.petugas = 'Anita Rahmawati (Staf TU Bagian Siswa)';
+          }
+        },
+
+        setDeadlineHours(hours) {
+          const d = new Date();
+          d.setHours(d.getHours() + hours);
+          const pad = (n) => String(n).padStart(2, '0');
+          this.assignForm.deadline = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:00`;
+        },
+
+        submitAssignment() {
+          if (!this.selectedTicket) return;
+          window.PengaduanDB.assignByAdmin(this.selectedTicket.id, this.assignForm);
+          this.showAssignModal = false;
+          this.loadData();
+        },
+
+        submitCloseTicket() {
+          if (!this.selectedTicket) return;
+          window.PengaduanDB.closeTicketByAdmin(this.selectedTicket.id, this.adminCloseFeedback);
+          this.showReviewModal = false;
+          this.loadData();
+        },
+
+        resetToDefault() {
+          if (confirm('Kembalikan seluruh data laporan pengaduan ke kondisi awal?')) {
+            window.PengaduanDB.resetData();
+            this.loadData();
+          }
+        },
+
+        formatStatus(st) {
+          const dict = {
+            masuk: 'Menunggu Verifikasi',
+            terverifikasi: 'Terverifikasi (Ditugaskan)',
+            dalam_proses: 'Sedang Ditangani',
+            menunggu_konfirmasi: 'Menunggu Review Selesai',
+            selesai: 'Selesai Tuntas',
+            ditolak: 'Ditolak'
+          };
+          return dict[st] || st;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

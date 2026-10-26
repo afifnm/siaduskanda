@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Petugas - SIADU SMKN 2 Karanganyar</title>
+  <meta name="description" content="Dashboard Petugas Lapangan & Teknisi SIADU SMKN 2 Karanganyar">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+  <!-- Shared Data Store -->
+  <script src="pengaduan-store.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#0a1120',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased font-sans selection:bg-emerald-600 selection:text-white min-h-screen flex flex-col justify-between" x-data="petugasApp()">
+
+  <!-- Top Navigation Bar Petugas -->
+  <header class="bg-[#0b241e] text-white sticky top-0 z-40 border-b border-emerald-950 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex items-center justify-between">
+      
+      <!-- Brand & School Logo -->
+      <a href="index.html" class="flex items-center gap-3">
+        <img 
+          src="https://smkn2kra.sch.id/images/logo-smkn2kra.png" 
+          alt="Logo SMKN 2 Kra" 
+          class="h-10 w-auto"
+          onerror="this.onerror=null; this.src='https://placehold.co/120x120/0b241e/ffffff?text=SMKN+2+KRA';"
+        >
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-extrabold tracking-tight text-white">SIADU</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white uppercase tracking-wider">PANEL PETUGAS</span>
+          </div>
+          <div class="text-[11px] text-emerald-200">SMK Negeri 2 Karanganyar</div>
+        </div>
+      </a>
+
+      <!-- Quick Nav & Switcher -->
+      <div class="flex items-center gap-3 text-xs font-semibold">
+        <a href="admin-dashboard.html" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition">
+          <i class="fa-solid fa-shield-halved text-blue-400"></i> Mode Admin
+        </a>
+        <a href="index.html" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition">
+          <i class="fa-solid fa-arrow-up-right-from-square text-amber-400"></i> Portal Publik
+        </a>
+
+        <!-- Petugas Profile -->
+        <div class="flex items-center gap-3 pl-2 border-l border-white/10">
+          <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">
+            JS
+          </div>
+          <div class="hidden md:block text-left leading-tight">
+            <span class="block text-xs font-bold text-white">Joko Susilo, S.Kom</span>
+            <span class="block text-[10px] text-emerald-300">Teknisi Unit IT & Sarpras</span>
+          </div>
+          <a href="login.html" class="p-1.5 text-slate-400 hover:text-white transition" title="Ganti Pengguna">
+            <i class="fa-solid fa-right-from-bracket text-sm"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sub Header / Status Bertugas -->
+  <div class="bg-white border-b border-slate-200 py-3 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h1 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-wrench text-emerald-600"></i>
+          Alur Petugas SIADU: Tindakan Lapangan & Unggah Bukti
+        </h1>
+        <p class="text-xs text-slate-500">Lihat penugasan masuk, jalankan tindakan teknis di lokasi, catat solusi, dan unggah foto bukti.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Status: Siap Bertugas
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1 space-y-6">
+
+    <!-- KPI Metric Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-slate-500 uppercase">Semua Tugas Saya</span>
+          <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-xs"><i class="fa-solid fa-list-check"></i></span>
+        </div>
+        <div class="text-2xl font-black text-slate-900" x-text="stats.total">0</div>
+        <div class="text-[11px] text-slate-400 mt-1">Total tugas didelegasikan</div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-blue-200 bg-blue-50/20 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-blue-700 uppercase">Tugas Baru Masuk</span>
+          <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center text-xs"><i class="fa-solid fa-bell"></i></span>
+        </div>
+        <div class="text-2xl font-black text-blue-600" x-text="stats.baru">0</div>
+        <div class="text-[11px] text-blue-600 font-medium mt-1">Perlu mulai penanganan</div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-purple-200 bg-purple-50/20 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-purple-700 uppercase">Sedang Dikerjakan</span>
+          <span class="w-7 h-7 rounded-lg bg-purple-100 text-purple-800 flex items-center justify-center text-xs"><i class="fa-solid fa-person-digging"></i></span>
+        </div>
+        <div class="text-2xl font-black text-purple-600" x-text="stats.proses">0</div>
+        <div class="text-[11px] text-purple-600 font-medium mt-1">Dalam tindakan teknis</div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-emerald-200 bg-emerald-50/20 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-emerald-700 uppercase">Selesai / Review</span>
+          <span class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs"><i class="fa-solid fa-circle-check"></i></span>
+        </div>
+        <div class="text-2xl font-black text-emerald-600" x-text="stats.selesai">0</div>
+        <div class="text-[11px] text-emerald-600 font-medium mt-1">Tuntas diperbaiki</div>
+      </div>
+    </div>
+
+    <!-- Filter Tab Bar -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+        <button @click="currentTab = 'semua'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
+          :class="currentTab === 'semua' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+          Semua Tugas (<span x-text="myTasks.length"></span>)
+        </button>
+        <button @click="currentTab = 'baru'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
+          :class="currentTab === 'baru' ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+          Tugas Baru (<span x-text="stats.baru"></span>)
+        </button>
+        <button @click="currentTab = 'proses'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
+          :class="currentTab === 'proses' ? 'bg-purple-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+          Dalam Tindakan (<span x-text="stats.proses"></span>)
+        </button>
+        <button @click="currentTab = 'selesai'" class="px-3.5 py-2 rounded-xl text-xs font-bold transition"
+          :class="currentTab === 'selesai' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'">
+          Selesai (<span x-text="stats.selesai"></span>)
+        </button>
+      </div>
+
+      <div class="text-xs text-slate-400 hidden sm:block">
+        Petugas: <strong class="text-slate-700">Joko Susilo, S.Kom</strong>
+      </div>
+    </div>
+
+    <!-- Task Cards Grid -->
+    <div class="space-y-4">
+      <template x-for="task in filteredTasks" :key="task.id">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 hover:border-emerald-300 transition space-y-4">
+          
+          <!-- Top Row: Badge Status & Urgensi -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-sm font-black text-blue-700" x-text="'#' + task.id"></span>
+              <span 
+                class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full"
+                :class="{
+                  'bg-blue-100 text-blue-800': task.status === 'terverifikasi',
+                  'bg-purple-100 text-purple-800': task.status === 'dalam_proses',
+                  'bg-teal-100 text-teal-800': task.status === 'menunggu_konfirmasi',
+                  'bg-emerald-100 text-emerald-800': task.status === 'selesai'
+                }"
+                x-text="formatStatus(task.status)"
+              ></span>
+              <span class="text-xs text-slate-400">• Dilaporkan: <span x-text="task.tanggalLapor"></span></span>
+            </div>
+
+            <!-- Urgensi Pill & Deadline Countdown -->
+            <div class="flex items-center gap-2">
+              <span 
+                class="px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5"
+                :class="{
+                  'bg-rose-50 text-rose-700 border border-rose-200': (task.urgensiAdmin || task.urgensiPelapor) === 'Ada risiko keselamatan',
+                  'bg-amber-50 text-amber-700 border border-amber-200': (task.urgensiAdmin || task.urgensiPelapor) === 'Mendesak',
+                  'bg-blue-50 text-blue-700 border border-blue-200': (task.urgensiAdmin || task.urgensiPelapor) === 'Normal'
+                }"
+              >
+                <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+                <span x-text="task.urgensiAdmin || task.urgensiPelapor"></span>
+              </span>
+
+              <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg" x-show="task.deadline">
+                <i class="fa-regular fa-clock text-slate-400 mr-1"></i> Target: <span x-text="task.deadline"></span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Body Info: Judul, Uraian, Lokasi, Instruksi Admin -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <div class="lg:col-span-8 space-y-2.5">
+              <h3 class="text-base font-extrabold text-slate-900" x-text="task.judul"></h3>
+              
+              <div class="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <i class="fa-solid fa-location-dot text-rose-500"></i>
+                <span>Lokasi: <span class="text-slate-900 font-bold" x-text="task.lokasi"></span></span>
+              </div>
+
+              <p class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200 leading-relaxed font-normal" x-text="task.uraian"></p>
+
+              <!-- Instruksi Khusus Admin -->
+              <div x-show="task.catatanAdmin" class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs">
+                <span class="font-bold text-amber-900 block mb-0.5"><i class="fa-solid fa-note-sticky mr-1"></i> Arahan / Instruksi Admin:</span>
+                <p class="text-amber-800" x-text="task.catatanAdmin"></p>
+              </div>
+
+              <!-- Catatan Pengerjaan Petugas (Jika sudah ada) -->
+              <div x-show="task.catatanPetugas" class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs">
+                <span class="font-bold text-emerald-900 block mb-0.5"><i class="fa-solid fa-check-circle mr-1"></i> Catatan Pengerjaan Terakhir:</span>
+                <p class="text-emerald-800" x-text="task.catatanPetugas"></p>
+              </div>
+            </div>
+
+            <!-- Bukti Foto Awal & Action Buttons -->
+            <div class="lg:col-span-4 flex flex-col justify-between space-y-3">
+              <div>
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Bukti Foto Pelapor:</span>
+                <template x-if="task.buktiPelapor">
+                  <img :src="task.buktiPelapor" alt="Bukti" class="w-full h-28 object-cover rounded-xl border border-slate-200 shadow-xs">
+                </template>
+                <template x-if="!task.buktiPelapor">
+                  <div class="w-full h-24 rounded-xl border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-xs text-slate-400 italic">
+                    Tidak ada lampiran foto
+                  </div>
+                </template>
+              </div>
+
+              <!-- Action Buttons Berdasarkan Status Alur C -->
+              <div class="pt-2 border-t border-slate-100 flex flex-wrap gap-2 justify-end">
+                
+                <!-- Status: Terverifikasi (Tugas Baru) -> Mulai Penanganan -->
+                <template x-if="task.status === 'terverifikasi'">
+                  <button @click="startProgress(task)" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play text-[10px]"></i> Mulai Penanganan Lapangan
+                  </button>
+                </template>
+
+                <!-- Status: Dalam Proses -> Catat Hasil & Bukti -->
+                <template x-if="task.status === 'dalam_proses'">
+                  <button @click="openActionModal(task)" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-camera text-[11px]"></i> Catat Hasil & Upload Bukti
+                  </button>
+                </template>
+
+                <!-- Status: Menunggu Konfirmasi / Selesai -->
+                <template x-if="task.status === 'menunggu_konfirmasi' || task.status === 'selesai'">
+                  <a :href="'lacak-pengaduan.html?ticket=' + task.id" class="w-full py-2 px-3 rounded-xl font-semibold text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 transition text-center flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-eye text-slate-500"></i> Lihat Hasil di Halaman Lacak
+                  </a>
+                </template>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </template>
+
+      <!-- Empty State -->
+      <template x-if="filteredTasks.length === 0">
+        <div class="bg-white rounded-2xl p-12 text-center border border-slate-200 shadow-sm space-y-3">
+          <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center text-2xl">
+            <i class="fa-solid fa-check-double"></i>
+          </div>
+          <h4 class="text-base font-bold text-slate-800">Tidak Ada Tugas Pada Kategori Ini</h4>
+          <p class="text-xs text-slate-500">Seluruh penugasan pada kategori ini telah tuntas dikerjakan atau belum ada tugas baru.</p>
+        </div>
+      </template>
+    </div>
+
+  </main>
+
+  <!-- MODAL: CATAT HASIL PENANGANAN & UNGGAH BUKTI (Step Alur Petugas) -->
+  <div x-show="showActionModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 transform transition-all text-left">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
+        <div>
+          <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Penyelesaian Tindakan</span>
+          <h3 class="text-lg font-black text-slate-900 mt-0.5">Catat Hasil & Ajukan Selesai</h3>
+        </div>
+        <button @click="showActionModal = false" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <template x-if="selectedTask">
+        <form @submit.prevent="submitResolution()" class="space-y-4">
+          
+          <!-- Ringkasan Tiket -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+            <span class="font-mono font-bold text-blue-700" x-text="'#' + selectedTask.id"></span>
+            <span class="font-bold text-slate-900 block mt-0.5" x-text="selectedTask.judul"></span>
+            <span class="text-slate-500 block text-[11px] mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i> <span x-text="selectedTask.lokasi"></span></span>
+          </div>
+
+          <!-- Catatan Tindakan Petugas -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Uraian Tindakan Pemeriksaan / Perbaikan Fisik <span class="text-rose-500">*</span>
+            </label>
+            <textarea 
+              rows="3" 
+              x-model="actionForm.catatanPetugas" 
+              placeholder="Contoh: Telah dilakukan penggantian kabel power, pembersihan soket RAM, dan pengujian kestabilan sistem selama 30 menit. Unit kembali berfungsi normal."
+              class="w-full p-3 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-emerald-600 bg-white"
+              required
+            ></textarea>
+          </div>
+
+          <!-- Suku Cadang / Alat Yang Digunakan (Opsional) -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Komponen / Suku Cadang Inventaris Terpakai <span class="text-slate-400 font-normal">(Jika ada)</span>
+            </label>
+            <input 
+              type="text" 
+              x-model="actionForm.sukuCadang" 
+              placeholder="Contoh: 1 Unit PSU 450W, 1 Buah Stopkontak Broco SNI" 
+              class="w-full p-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-emerald-600 bg-white"
+            >
+          </div>
+
+          <!-- Unggah Bukti Foto Pengerjaan -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Unggah Foto Bukti Penanganan Selesai <span class="text-rose-500">*</span>
+            </label>
+
+            <div class="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-2xl p-4 text-center bg-slate-50 transition cursor-pointer relative"
+                 @click="$refs.evidenceInput.click()">
+              <input type="file" x-ref="evidenceInput" @change="handleFileUpload($event)" class="hidden" accept="image/*">
+              
+              <template x-if="!actionForm.buktiPetugas">
+                <div class="space-y-1.5">
+                  <div class="w-10 h-10 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-base">
+                    <i class="fa-solid fa-camera"></i>
+                  </div>
+                  <div class="text-xs font-bold text-slate-700">Pilih Foto Kondisi Setelah Perbaikan</div>
+                  <div class="text-[11px] text-slate-400">JPG, PNG (Foto bukti nyata pengerjaan)</div>
+                  <div class="pt-1">
+                    <button type="button" @click.stop="useSampleEvidence()" class="text-[11px] px-2.5 py-1 bg-white border border-slate-300 rounded hover:bg-emerald-50 hover:text-emerald-700 font-semibold">
+                      Gunakan Foto Bukti Demo
+                    </button>
+                  </div>
+                </div>
+              </template>
+
+              <template x-if="actionForm.buktiPetugas">
+                <div class="flex items-center justify-between text-left">
+                  <div class="flex items-center gap-3">
+                    <img :src="actionForm.buktiPetugas" alt="Bukti Selesai" class="w-16 h-16 object-cover rounded-xl border border-slate-200">
+                    <div>
+                      <span class="text-xs font-bold text-slate-800 block">Foto Bukti Terpasang</span>
+                      <span class="text-[11px] text-emerald-600 font-bold"><i class="fa-solid fa-circle-check"></i> Siap dilampirkan</span>
+                    </div>
+                  </div>
+                  <button type="button" @click.stop="actionForm.buktiPetugas = null" class="text-xs text-rose-600 hover:text-rose-800 font-bold px-3 py-1.5 rounded-lg hover:bg-rose-50">
+                    Ganti Foto
+                  </button>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- Konfirmasi Penyelesaian -->
+          <div class="pt-2">
+            <label class="flex items-start gap-2.5 cursor-pointer text-xs text-slate-600">
+              <input type="checkbox" required class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500">
+              <span>Saya menyatakan pekerjaan penanganan fasilitas ini telah diuji coba dan aman untuk digunakan kembali oleh warga sekolah.</span>
+            </label>
+          </div>
+
+          <!-- Actions -->
+          <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+            <button type="button" @click="showActionModal = false" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">
+              Batal
+            </button>
+            <button type="submit" class="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-paper-plane"></i> Ajukan Status Selesai ke Admin
+            </button>
+          </div>
+
+        </form>
+      </template>
+
+    </div>
+  </div>
+
+  <!-- Minimal Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    <p>&copy; 2026 SMK Negeri 2 Karanganyar • SIADU Modul Petugas Penanganan</p>
+  </footer>
+
+  <script>
+    function petugasApp() {
+      return {
+        tasks: [],
+        currentTab: 'semua',
+        showActionModal: false,
+        selectedTask: null,
+
+        actionForm: {
+          catatanPetugas: '',
+          sukuCadang: '',
+          buktiPetugas: null
+        },
+
+        stats: {
+          total: 0,
+          baru: 0,
+          proses: 0,
+          selesai: 0
+        },
+
+        init() {
+          this.loadData();
+        },
+
+        loadData() {
+          this.tasks = window.PengaduanDB.getAll();
+          this.computeStats();
+        },
+
+        get myTasks() {
+          // Petugas Joko Susilo melihat tugas yang relevan dengan IT/Sarpras atau yang belum ditugaskan/ditugaskan kepadanya
+          return this.tasks.filter(t => t.status !== 'masuk');
+        },
+
+        computeStats() {
+          const list = this.myTasks;
+          this.stats.total = list.length;
+          this.stats.baru = list.filter(t => t.status === 'terverifikasi').length;
+          this.stats.proses = list.filter(t => t.status === 'dalam_proses').length;
+          this.stats.selesai = list.filter(t => ['menunggu_konfirmasi', 'selesai'].includes(t.status)).length;
+        },
+
+        get filteredTasks() {
+          if (this.currentTab === 'baru') {
+            return this.myTasks.filter(t => t.status === 'terverifikasi');
+          } else if (this.currentTab === 'proses') {
+            return this.myTasks.filter(t => t.status === 'dalam_proses');
+          } else if (this.currentTab === 'selesai') {
+            return this.myTasks.filter(t => ['menunggu_konfirmasi', 'selesai'].includes(t.status));
+          }
+          return this.myTasks;
+        },
+
+        startProgress(task) {
+          window.PengaduanDB.startProgressByPetugas(task.id, 'Joko Susilo, S.Kom (Teknisi Lab & IT)');
+          this.loadData();
+          this.currentTab = 'proses';
+        },
+
+        openActionModal(task) {
+          this.selectedTask = task;
+          this.actionForm.catatanPetugas = task.catatanPetugas || '';
+          this.actionForm.sukuCadang = '';
+          this.actionForm.buktiPetugas = task.buktiPetugas || null;
+          this.showActionModal = true;
+        },
+
+        useSampleEvidence() {
+          this.actionForm.buktiPetugas = 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=600&q=80';
+          if (!this.actionForm.catatanPetugas) {
+            this.actionForm.catatanPetugas = 'Perangkat telah dibersihkan, komponen daya diganti dengan stok inventaris baru, dan telah lulus uji kelayakan 30 menit.';
+          }
+          if (!this.actionForm.sukuCadang) {
+            this.actionForm.sukuCadang = '1x Unit Power Supply 450W Standar';
+          }
+        },
+
+        handleFileUpload(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            this.actionForm.buktiPetugas = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        },
+
+        submitResolution() {
+          if (!this.selectedTask) return;
+          
+          let catatanLengkap = this.actionForm.catatanPetugas;
+          if (this.actionForm.sukuCadang) {
+            catatanLengkap += ` (Suku cadang: ${this.actionForm.sukuCadang})`;
+          }
+
+          window.PengaduanDB.submitResolutionByPetugas(this.selectedTask.id, {
+            catatanPetugas: catatanLengkap,
+            buktiPetugas: this.actionForm.buktiPetugas,
+            namaPetugas: 'Joko Susilo, S.Kom (Teknisi Lab & IT)'
+          });
+
+          this.showActionModal = false;
+          this.loadData();
+          this.currentTab = 'selesai';
+        },
+
+        formatStatus(st) {
+          const dict = {
+            masuk: 'Menunggu Verifikasi',
+            terverifikasi: 'Tugas Baru Diberikan',
+            dalam_proses: 'Sedang Ditangani',
+            menunggu_konfirmasi: 'Diajukan Selesai (Menunggu Review)',
+            selesai: 'Selesai Tuntas'
+          };
+          return dict[st] || st;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

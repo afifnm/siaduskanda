@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulir Pengaduan - SIADU SMKN 2 Karanganyar</title>
+  <meta name="description" content="Formulir Pengaduan Resmi SIADU SMK Negeri 2 Karanganyar. Laporkan sarana prasarana, akademik, administrasi, dan perlindungan warga sekolah.">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+  <!-- Shared Data Store -->
+  <script src="pengaduan-store.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#0a1120',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased font-sans selection:bg-blue-600 selection:text-white min-h-screen flex flex-col justify-between" x-data="buatPengaduanApp()">
+
+  <!-- Top Simple Navigation Bar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <img 
+          src="https://smkn2kra.sch.id/images/logo-smkn2kra.png" 
+          alt="Logo SMKN 2 Karanganyar" 
+          class="h-10 w-auto"
+          onerror="this.onerror=null; this.src='https://placehold.co/120x120/1e293b/ffffff?text=SMKN+2+KRA';"
+        >
+        <div class="leading-tight">
+          <span class="text-[11px] font-bold text-blue-700 tracking-wider uppercase block">SMK Negeri 2 Karanganyar</span>
+          <span class="text-sm font-black text-slate-900">SIADU • Layanan Pengaduan</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2 text-xs font-semibold">
+        <a href="index.html" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition hidden sm:inline-flex items-center gap-1.5">
+          <i class="fa-solid fa-house text-slate-400"></i> Beranda
+        </a>
+        <a href="lacak-pengaduan.html" class="px-3 py-1.5 rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-100 transition inline-flex items-center gap-1.5">
+          <i class="fa-solid fa-magnifying-glass"></i> Lacak Tiket
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Step Progress Indicator -->
+  <div class="bg-white border-b border-slate-200 py-3">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+        <div class="flex items-center gap-2 text-blue-700">
+          <span class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">1</span>
+          <span>Isi Formulir</span>
+        </div>
+        <div class="flex-1 h-0.5 bg-slate-200 mx-3"></div>
+        <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold">2</span>
+          <span>Terima Nomor Tiket</span>
+        </div>
+        <div class="flex-1 h-0.5 bg-slate-200 mx-3"></div>
+        <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold">3</span>
+          <span>Lacak & Lihat Hasil</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-8 w-full flex-1">
+
+    <!-- Card Wrapper -->
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+      
+      <!-- Formulir Header Banner (Sesuai Desain Acuan Gambar) -->
+      <div class="bg-[#0f1f38] text-white p-6 sm:p-7 border-b border-slate-800 relative">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white mb-1">Formulir Pengaduan</h1>
+            <p class="text-sm font-semibold text-blue-200">SMK Negeri 2 Karanganyar</p>
+            <p class="text-[11px] font-mono tracking-wide text-slate-300 mt-2 uppercase flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              PROTOTIPE — simulasi antarmuka, belum terhubung ke server
+            </p>
+          </div>
+          <img 
+            src="https://smkn2kra.sch.id/images/logo-smkn2kra.png" 
+            alt="Logo" 
+            class="h-12 w-auto opacity-80 hidden sm:block"
+            onerror="this.onerror=null; this.src='https://placehold.co/120x120/1e293b/ffffff?text=SMK';"
+          >
+        </div>
+      </div>
+
+      <!-- Formulir Content Body -->
+      <form @submit.prevent="submitForm()" class="p-6 sm:p-8 space-y-7">
+
+        <!-- 1. Kategori Pengaduan -->
+        <div>
+          <label class="block text-sm font-bold text-slate-900 mb-3">
+            Kategori pengaduan <span class="text-rose-500">*</span>
+          </label>
+          <div class="space-y-2.5">
+            <template x-for="cat in kategoriOptions" :key="cat.value">
+              <label class="flex items-center gap-3 p-3 rounded-xl border transition cursor-pointer"
+                :class="form.kategori === cat.value ? 'border-blue-600 bg-blue-50/70 text-blue-950 font-semibold' : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'">
+                <input 
+                  type="radio" 
+                  name="kategori" 
+                  :value="cat.value" 
+                  x-model="form.kategori" 
+                  class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300"
+                  required
+                >
+                <div class="flex items-center gap-2.5 text-sm">
+                  <i :class="cat.icon" class="text-slate-500 text-sm w-4 text-center"></i>
+                  <span x-text="cat.label"></span>
+                </div>
+              </label>
+            </template>
+          </div>
+        </div>
+
+        <!-- 2. Jenis Pelapor -->
+        <div>
+          <label class="block text-sm font-bold text-slate-900 mb-3">
+            Jenis pelapor <span class="text-rose-500">*</span>
+          </label>
+          <div class="space-y-2.5">
+            <template x-for="role in jenisPelaporOptions" :key="role.value">
+              <label class="flex items-center gap-3 p-3 rounded-xl border transition cursor-pointer"
+                :class="form.jenisPelapor === role.value ? 'border-blue-600 bg-blue-50/70 text-blue-950 font-semibold' : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'">
+                <input 
+                  type="radio" 
+                  name="jenisPelapor" 
+                  :value="role.value" 
+                  x-model="form.jenisPelapor" 
+                  class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300"
+                  required
+                >
+                <span class="text-sm" x-text="role.label"></span>
+              </label>
+            </template>
+          </div>
+        </div>
+
+        <!-- Opsi Identitas Pelapor (Bisa Anonim / Terbuka) -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Identitas Pelapor</span>
+            <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-600">
+              <input type="checkbox" x-model="isAnonim" class="rounded text-blue-600 focus:ring-blue-500">
+              <span>Kirim Sebagai Anonim (Rahasiakan Nama)</span>
+            </label>
+          </div>
+
+          <div x-show="!isAnonim" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap / NISN / NIP</label>
+              <input 
+                type="text" 
+                x-model="form.namaPelapor" 
+                placeholder="Contoh: Budi Santoso (XI RPL 2)" 
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
+              >
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp (Untuk Info Tiket)</label>
+              <input 
+                type="text" 
+                x-model="form.kontak" 
+                placeholder="Contoh: 081234567890" 
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white"
+              >
+            </div>
+          </div>
+          <p x-show="isAnonim" class="text-xs text-amber-700 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+            <i class="fa-solid fa-user-secret mr-1.5"></i> Mode Anonim aktif: Laporan akan diteruskan ke tim penanganan tanpa mencantumkan nama dan nomor telepon Anda.
+          </p>
+        </div>
+
+        <!-- 3. Judul Laporan -->
+        <div>
+          <label class="block text-sm font-bold text-slate-900 mb-1.5">
+            Judul laporan <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            x-model="form.judul" 
+            placeholder="Contoh: Komputer laboratorium tidak berfungsi" 
+            class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-slate-50/50"
+            required
+          >
+        </div>
+
+        <!-- 4. Lokasi Kejadian (Jika Relevan) -->
+        <div>
+          <label class="block text-sm font-bold text-slate-900 mb-1.5">
+            Lokasi kejadian (jika relevan)
+          </label>
+          <input 
+            type="text" 
+            x-model="form.lokasi" 
+            placeholder="Contoh: Laboratorium RPL" 
+            class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-slate-50/50"
+          >
+          <div class="flex flex-wrap gap-1.5 mt-2">
+            <span class="text-[11px] text-slate-400 self-center">Pilihan cepat:</span>
+            <button type="button" @click="form.lokasi = 'Laboratorium Komputer RPL 2, Lantai 2'" class="text-[11px] bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded text-slate-700 transition">Lab RPL</button>
+            <button type="button" @click="form.lokasi = 'Bengkel Teknik Pemesinan Bubut'" class="text-[11px] bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded text-slate-700 transition">Bengkel Mesin</button>
+            <button type="button" @click="form.lokasi = 'Bengkel Otomotif TKR'" class="text-[11px] bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded text-slate-700 transition">Bengkel TKR</button>
+            <button type="button" @click="form.lokasi = 'Ruang Perpustakaan Gedung A'" class="text-[11px] bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded text-slate-700 transition">Perpustakaan</button>
+            <button type="button" @click="form.lokasi = 'Toilet Siswa Lantai 1'" class="text-[11px] bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded text-slate-700 transition">Toilet Siswa</button>
+          </div>
+        </div>
+
+        <!-- 5. Uraian Pengaduan -->
+        <div>
+          <label class="block text-sm font-bold text-slate-900 mb-1.5">
+            Uraian pengaduan <span class="text-rose-500">*</span>
+          </label>
+          <textarea 
+            rows="4" 
+            x-model="form.uraian" 
+            placeholder="Jelaskan masalah, waktu kejadian, dan dampaknya. Hindari mencantumkan data pribadi yang tidak diperlukan."
+            class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-slate-50/50"
+            required
+          ></textarea>
+        </div>
+
+        <!-- 6. Urgensi yang Dirasakan Pelapor -->
+        <div>
+          <label class="block text-sm font-bold text-slate-900 mb-3">
+            Urgensi yang dirasakan pelapor <span class="text-rose-500">*</span>
+          </label>
+          <div class="space-y-2.5">
+            <label class="flex items-center gap-3 p-3 rounded-xl border transition cursor-pointer"
+              :class="form.urgensiPelapor === 'Normal' ? 'border-blue-600 bg-blue-50/70 text-blue-950 font-semibold' : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'">
+              <input 
+                type="radio" 
+                name="urgensi" 
+                value="Normal" 
+                x-model="form.urgensiPelapor" 
+                class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-slate-300"
+                required
+              >
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                <span class="text-sm">Normal</span>
+              </div>
+            </label>
+
+            <label class="flex items-center gap-3 p-3 rounded-xl border transition cursor-pointer"
+              :class="form.urgensiPelapor === 'Mendesak' ? 'border-amber-600 bg-amber-50/70 text-amber-950 font-semibold' : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'">
+              <input 
+                type="radio" 
+                name="urgensi" 
+                value="Mendesak" 
+                x-model="form.urgensiPelapor" 
+                class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-slate-300"
+              >
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                <span class="text-sm">Mendesak</span>
+              </div>
+            </label>
+
+            <label class="flex items-center gap-3 p-3 rounded-xl border transition cursor-pointer"
+              :class="form.urgensiPelapor === 'Ada risiko keselamatan' ? 'border-rose-600 bg-rose-50/70 text-rose-950 font-semibold' : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'">
+              <input 
+                type="radio" 
+                name="urgensi" 
+                value="Ada risiko keselamatan" 
+                x-model="form.urgensiPelapor" 
+                class="w-4 h-4 text-rose-600 focus:ring-rose-500 border-slate-300"
+              >
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
+                <span class="text-sm">Ada risiko keselamatan</span>
+              </div>
+            </label>
+          </div>
+          <!-- Disclaimer footnote dari gambar -->
+          <p class="text-xs text-slate-500 mt-2.5 italic">
+            Petugas tetap harus memverifikasi urgensi. Formulir ini bukan kanal respons darurat.
+          </p>
+        </div>
+
+        <!-- 7. Lampiran Foto Bukti (Pelengkap Unggulan) -->
+        <div>
+          <label class="block text-sm font-bold text-slate-900 mb-1.5">
+            Unggah Foto Bukti Kejadian / Kerusakan <span class="text-xs font-normal text-slate-500">(Opsional)</span>
+          </label>
+          <div class="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-5 text-center bg-slate-50 transition cursor-pointer relative"
+               @click="$refs.fileInput.click()">
+            <input type="file" x-ref="fileInput" @change="handleFileUpload($event)" class="hidden" accept="image/*">
+            
+            <template x-if="!form.buktiPelapor">
+              <div class="space-y-2">
+                <div class="w-12 h-12 mx-auto rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-lg">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="text-xs font-semibold text-slate-700">Klik untuk memilih foto kerusakan atau seret file ke sini</div>
+                <div class="text-[11px] text-slate-400">Format JPG, PNG (Maksimal 5MB)</div>
+                <!-- Preset Sample Images for Demo -->
+                <div class="pt-2 flex items-center justify-center gap-2">
+                  <button type="button" @click.stop="useSampleImage('lab')" class="text-[11px] px-2.5 py-1 bg-white border border-slate-300 rounded hover:bg-blue-50 hover:text-blue-700">
+                    Gunakan Contoh Foto Lab Komputer
+                  </button>
+                  <button type="button" @click.stop="useSampleImage('listrik')" class="text-[11px] px-2.5 py-1 bg-white border border-slate-300 rounded hover:bg-blue-50 hover:text-blue-700">
+                    Contoh Foto Kelistrikan
+                  </button>
+                </div>
+              </div>
+            </template>
+
+            <template x-if="form.buktiPelapor">
+              <div class="flex items-center justify-between gap-4 text-left">
+                <div class="flex items-center gap-3">
+                  <img :src="form.buktiPelapor" alt="Bukti Foto" class="w-16 h-16 object-cover rounded-xl border border-slate-200">
+                  <div>
+                    <span class="text-xs font-bold text-slate-800 block">Foto Bukti Terlampir</span>
+                    <span class="text-[11px] text-emerald-600 font-semibold"><i class="fa-solid fa-check"></i> Siap diunggah bersama laporan</span>
+                  </div>
+                </div>
+                <button type="button" @click.stop="form.buktiPelapor = null" class="text-xs text-rose-600 hover:text-rose-800 font-bold px-3 py-1.5 rounded-lg hover:bg-rose-50">
+                  Hapus Foto
+                </button>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- 8. Persetujuan & Checkbox -->
+        <div class="pt-2">
+          <label class="flex items-start gap-2.5 cursor-pointer text-xs text-slate-600">
+            <input type="checkbox" required class="mt-0.5 rounded text-blue-600 focus:ring-blue-500">
+            <span>Saya menyatakan bahwa informasi yang saya sampaikan adalah benar untuk kepentingan penanganan dan perbaikan fasilitas di SMK Negeri 2 Karanganyar.</span>
+          </label>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center gap-3 justify-end">
+          <a href="index.html" class="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 text-center transition">
+            Batal
+          </a>
+          <button 
+            type="submit" 
+            :disabled="isSubmitting"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25 transition disabled:opacity-50">
+            <template x-if="isSubmitting">
+              <span class="flex items-center gap-2">
+                <i class="fa-solid fa-spinner fa-spin"></i> Memproses Laporan...
+              </span>
+            </template>
+            <template x-if="!isSubmitting">
+              <span class="flex items-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i> Kirim Pengaduan Sekarang
+              </span>
+            </template>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Quick Help & Disclaimer -->
+    <div class="mt-6 text-center text-xs text-slate-500 space-y-1">
+      <p>SMK Negeri 2 Karanganyar menjamin kerahasiaan data identitas setiap pelapor sesuai SOP Pengaduan.</p>
+      <p>Butuh bantuan segera terkait ancaman fisik mendesak? Hubungi Satgas Pencegahan Kekerasan Sekolah di (0271) 494549.</p>
+    </div>
+  </main>
+
+  <!-- MODAL SUKSES PENERBITAN TIKET (Step 3: Terima Nomor Tiket) -->
+  <div x-show="showSuccessModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 transform transition-all text-center">
+      
+      <!-- Icon Success -->
+      <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-2xl font-bold mb-4 shadow-lg shadow-emerald-500/20">
+        <i class="fa-solid fa-check"></i>
+      </div>
+
+      <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">Laporan Berhasil Dikirim</span>
+      <h3 class="text-2xl font-black text-slate-900 mt-2 mb-2">Terima Kasih, Laporan Diterima!</h3>
+      <p class="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto mb-6">
+        Laporan Anda telah tercatat ke antrean verifikasi Admin SMKN 2 Karanganyar. Simpan nomor tiket berikut untuk melacak penanganan.
+      </p>
+
+      <!-- Ticket Box -->
+      <div class="bg-slate-50 border-2 border-dashed border-blue-300 rounded-2xl p-5 mb-6 text-left relative">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Nomor Tiket Anda</span>
+          <span class="text-[11px] px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-bold">SMKN2-KRA</span>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <span class="font-mono text-2xl sm:text-3xl font-extrabold text-blue-700 tracking-wider" x-text="generatedTicket ? generatedTicket.id : ''"></span>
+          <button @click="copyTicket()" class="px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-blue-50 hover:text-blue-700 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid" :class="isCopied ? 'fa-check text-emerald-600' : 'fa-copy'"></i>
+            <span x-text="isCopied ? 'Tersalin!' : 'Salin Tiket'"></span>
+          </button>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-200 text-xs space-y-1 text-slate-600">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Judul:</span>
+            <span class="font-semibold text-slate-800 truncate max-w-[200px]" x-text="generatedTicket ? generatedTicket.judul : ''"></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Kategori:</span>
+            <span class="font-semibold text-slate-800" x-text="generatedTicket ? generatedTicket.kategori : ''"></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Tingkat Urgensi:</span>
+            <span class="font-semibold text-amber-700" x-text="generatedTicket ? generatedTicket.urgensiPelapor : ''"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="space-y-2.5">
+        <a :href="'lacak-pengaduan.html?ticket=' + (generatedTicket ? generatedTicket.id : '')" 
+           class="w-full inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          Lacak Perkembangan Sekarang
+        </a>
+        <a href="index.html" class="w-full inline-flex items-center justify-center py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+          Kembali ke Beranda
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Minimal Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    <p>&copy; 2026 SMK Negeri 2 Karanganyar • SIADU (Sistem Informasi Pengaduan & Aspirasi)</p>
+  </footer>
+
+  <script>
+    function buatPengaduanApp() {
+      return {
+        isSubmitting: false,
+        showSuccessModal: false,
+        isCopied: false,
+        isAnonim: false,
+        generatedTicket: null,
+
+        form: {
+          kategori: 'Sarana dan prasarana',
+          jenisPelapor: 'Siswa',
+          namaPelapor: 'Rizky Pratama (XI RPL 1)',
+          kontak: '081234567890',
+          judul: '',
+          lokasi: '',
+          uraian: '',
+          urgensiPelapor: 'Normal',
+          buktiPelapor: null
+        },
+
+        kategoriOptions: [
+          { value: 'Sarana dan prasarana', label: 'Sarana dan prasarana', icon: 'fa-solid fa-wrench' },
+          { value: 'Pembelajaran dan akademik', label: 'Pembelajaran dan akademik', icon: 'fa-solid fa-book-open' },
+          { value: 'Layanan administrasi', label: 'Layanan administrasi', icon: 'fa-solid fa-file-lines' },
+          { value: 'Perlindungan warga sekolah', label: 'Perlindungan warga sekolah', icon: 'fa-solid fa-shield-halved' },
+          { value: 'Saran dan aspirasi', label: 'Saran dan aspirasi', icon: 'fa-solid fa-comment-dots' }
+        ],
+
+        jenisPelaporOptions: [
+          { value: 'Siswa', label: 'Siswa' },
+          { value: 'Guru', label: 'Guru' },
+          { value: 'Tenaga kependidikan', label: 'Tenaga kependidikan' },
+          { value: 'Orang tua/wali', label: 'Orang tua/wali' }
+        ],
+
+        handleFileUpload(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            this.form.buktiPelapor = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        },
+
+        useSampleImage(type) {
+          if (type === 'lab') {
+            this.form.buktiPelapor = 'https://images.unsplash.com/photo-1588508065123-287b28e013da?auto=format&fit=crop&w=600&q=80';
+            if (!this.form.judul) this.form.judul = 'Komputer Lab RPL 2 Nomor 14 Tidak Mau Menyala';
+            if (!this.form.lokasi) this.form.lokasi = 'Laboratorium RPL Gedung C Lt 2';
+          } else {
+            this.form.buktiPelapor = 'https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?auto=format&fit=crop&w=600&q=80';
+            if (!this.form.judul) this.form.judul = 'Stopkontak Kabel Terbuka dan Berpotensi Korsleting';
+            if (!this.form.lokasi) this.form.lokasi = 'Bengkel Teknik Pemesinan';
+            this.form.urgensiPelapor = 'Ada risiko keselamatan';
+          }
+        },
+
+        submitForm() {
+          this.isSubmitting = true;
+
+          setTimeout(() => {
+            const payload = {
+              kategori: this.form.kategori,
+              jenisPelapor: this.form.jenisPelapor,
+              namaPelapor: this.isAnonim ? 'Pelapor Anonim' : (this.form.namaPelapor || 'Warga SMKN 2 Kra'),
+              kontak: this.isAnonim ? '-' : (this.form.kontak || '-'),
+              judul: this.form.judul,
+              lokasi: this.form.lokasi,
+              uraian: this.form.uraian,
+              urgensiPelapor: this.form.urgensiPelapor,
+              buktiPelapor: this.form.buktiPelapor
+            };
+
+            const created = window.PengaduanDB.create(payload);
+            this.generatedTicket = created;
+            this.isSubmitting = false;
+            this.showSuccessModal = true;
+          }, 600);
+        },
+
+        copyTicket() {
+          if (!this.generatedTicket) return;
+          navigator.clipboard.writeText(this.generatedTicket.id);
+          this.isCopied = true;
+          setTimeout(() => this.isCopied = false, 2500);
+        }
+      }
+    }
+  </script>
+</body>
+</html>

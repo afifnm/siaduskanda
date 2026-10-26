@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lacak Pengaduan - SIADU SMKN 2 Karanganyar</title>
+  <meta name="description" content="Lacak perkembangan dan hasil tindak lanjut aduan Anda di SIADU SMK Negeri 2 Karanganyar secara transparan dan akuntabel.">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+  <!-- Data Store -->
+  <script src="pengaduan-store.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#0a1120',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans selection:bg-blue-600 selection:text-white min-h-screen flex flex-col justify-between" x-data="lacakApp()">
+
+  <!-- Navbar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <img 
+          src="https://smkn2kra.sch.id/images/logo-smkn2kra.png" 
+          alt="Logo SMKN 2 Karanganyar" 
+          class="h-10 w-auto"
+          onerror="this.onerror=null; this.src='https://placehold.co/120x120/1e293b/ffffff?text=SMKN+2+KRA';"
+        >
+        <div>
+          <span class="text-[11px] font-bold text-blue-700 tracking-wider uppercase block">SMK Negeri 2 Karanganyar</span>
+          <span class="text-sm font-black text-slate-900">SIADU • Pelacakan Status & Hasil</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2 text-xs font-semibold">
+        <a href="index.html" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition hidden sm:inline-flex items-center gap-1.5">
+          <i class="fa-solid fa-house text-slate-400"></i> Beranda
+        </a>
+        <a href="buat-pengaduan.html" class="px-3.5 py-2 rounded-xl text-white bg-blue-600 hover:bg-blue-700 transition inline-flex items-center gap-1.5 font-bold shadow-sm">
+          <i class="fa-solid fa-plus-circle text-xs"></i> Buat Laporan Baru
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1 space-y-8">
+
+    <!-- Search Section -->
+    <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+      <div class="max-w-2xl mx-auto text-center space-y-3">
+        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 mx-auto flex items-center justify-center text-xl font-bold">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Lacak Perkembangan Laporan</h1>
+        <p class="text-xs sm:text-sm text-slate-500">Pantau proses verifikasi, penugasan unit kerja, tindakan teknis petugas, hingga bukti penyelesaian.</p>
+
+        <!-- Search Input -->
+        <form @submit.prevent="searchTicket()" class="pt-2">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <div class="relative flex-1">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 pointer-events-none">
+                <i class="fa-solid fa-hashtag text-sm"></i>
+              </span>
+              <input 
+                type="text" 
+                x-model="ticketQuery" 
+                placeholder="Masukkan Nomor Tiket (misal: TKT-2026-0482)" 
+                class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-300 font-mono text-sm uppercase font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-slate-50"
+                required
+              >
+            </div>
+            <button type="submit" class="px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-500/20 transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-search"></i> Cari Tiket
+            </button>
+          </div>
+        </form>
+
+        <!-- Quick Demo Ticket Chips -->
+        <div class="pt-3 flex flex-wrap items-center justify-center gap-2 text-xs">
+          <span class="text-slate-400 font-medium">Contoh Tiket Simulasi:</span>
+          <button @click="loadTicket('TKT-2026-0482')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 font-mono font-semibold transition border border-slate-200">
+            #TKT-2026-0482 (Lab Komputer - Dalam Pengerjaan)
+          </button>
+          <button @click="loadTicket('TKT-2026-0481')" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-mono font-semibold transition border border-emerald-200">
+            #TKT-2026-0481 (Bengkel Mesin - Selesai)
+          </button>
+          <button @click="loadTicket('TKT-2026-0483')" class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 font-mono font-semibold transition border border-amber-200">
+            #TKT-2026-0483 (WiFi - Baru Masuk)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET NOT FOUND STATE -->
+    <template x-if="ticketNotFound">
+      <div class="bg-white rounded-2xl p-10 text-center border border-slate-200 shadow-sm max-w-lg mx-auto space-y-4">
+        <div class="w-16 h-16 rounded-full bg-rose-50 text-rose-500 mx-auto flex items-center justify-center text-2xl font-bold">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900">Nomor Tiket Tidak Ditemukan</h3>
+        <p class="text-xs text-slate-500">Nomor tiket "<span class="font-mono font-bold text-slate-800" x-text="ticketQuery"></span>" belum terdaftar di sistem pengaduan SMKN 2 Karanganyar. Silakan periksa kembali nomor tiket Anda.</p>
+        <button @click="loadTicket('TKT-2026-0482')" class="px-4 py-2 rounded-xl bg-blue-50 text-blue-700 font-bold text-xs hover:bg-blue-100 transition">
+          Muat Data Contoh (#TKT-2026-0482)
+        </button>
+      </div>
+    </template>
+
+    <!-- TICKET FOUND: MAIN DETAILS -->
+    <template x-if="ticketData">
+      <div class="space-y-6">
+
+        <!-- Header Card Status -->
+        <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+            <div>
+              <div class="flex items-center gap-2.5 mb-1.5">
+                <span class="font-mono text-xl sm:text-2xl font-black text-blue-700" x-text="'#' + ticketData.id"></span>
+                <span 
+                  class="text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider"
+                  :class="{
+                    'bg-amber-100 text-amber-800 border border-amber-200': ticketData.status === 'masuk',
+                    'bg-blue-100 text-blue-800 border border-blue-200': ticketData.status === 'terverifikasi',
+                    'bg-purple-100 text-purple-800 border border-purple-200': ticketData.status === 'dalam_proses',
+                    'bg-teal-100 text-teal-800 border border-teal-200': ticketData.status === 'menunggu_konfirmasi',
+                    'bg-emerald-100 text-emerald-800 border border-emerald-200': ticketData.status === 'selesai'
+                  }"
+                  x-text="formatStatus(ticketData.status)"
+                ></span>
+              </div>
+              <h2 class="text-lg sm:text-xl font-bold text-slate-900" x-text="ticketData.judul"></h2>
+              <div class="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-500 mt-2">
+                <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-slate-400"></i> Dilaporkan: <strong class="text-slate-700" x-text="ticketData.tanggalLapor"></strong></span>
+                <span>•</span>
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-slate-400"></i> Lokasi: <strong class="text-slate-700" x-text="ticketData.lokasi"></strong></span>
+                <span>•</span>
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-user text-slate-400"></i> Pelapor: <strong class="text-slate-700" x-text="ticketData.namaPelapor"></strong></span>
+              </div>
+            </div>
+
+            <!-- Priority Badge Box -->
+            <div class="sm:text-right shrink-0">
+              <span class="text-[11px] font-bold text-slate-400 block mb-1">Tingkat Urgensi:</span>
+              <span 
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold"
+                :class="{
+                  'bg-blue-50 text-blue-700 border border-blue-200': ticketData.urgensiPelapor === 'Normal',
+                  'bg-amber-50 text-amber-700 border border-amber-200': ticketData.urgensiPelapor === 'Mendesak',
+                  'bg-rose-50 text-rose-700 border border-rose-200': ticketData.urgensiPelapor === 'Ada risiko keselamatan'
+                }"
+              >
+                <i class="fa-solid fa-circle-exclamation text-xs"></i>
+                <span x-text="ticketData.urgensiAdmin || ticketData.urgensiPelapor"></span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Visual Stepper Progress Bar (5 Steps) -->
+          <div class="pt-6">
+            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Progres Penanganan Aduan</h4>
+            
+            <div class="relative">
+              <!-- Line Connector -->
+              <div class="absolute top-5 left-4 right-4 h-1 bg-slate-200 -z-0 hidden md:block"></div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-5 gap-4 relative z-10">
+                <!-- Step 1: Laporan Diterima -->
+                <div class="flex md:flex-col items-center md:text-center gap-3">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-blue-600 text-white shadow-md shadow-blue-500/30 shrink-0">
+                    <i class="fa-solid fa-check"></i>
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-slate-900">1. Laporan Masuk</div>
+                    <div class="text-[11px] text-slate-500">Tercatat di sistem</div>
+                  </div>
+                </div>
+
+                <!-- Step 2: Verifikasi Admin -->
+                <div class="flex md:flex-col items-center md:text-center gap-3">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
+                       :class="getStepIndex(ticketData.status) >= 2 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'bg-slate-200 text-slate-500'">
+                    <i class="fa-solid" :class="getStepIndex(ticketData.status) >= 2 ? 'fa-check' : 'fa-clipboard-check'"></i>
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-slate-900">2. Verifikasi Admin</div>
+                    <div class="text-[11px] text-slate-500">Validasi & Kategori</div>
+                  </div>
+                </div>
+
+                <!-- Step 3: Ditugaskan ke Unit -->
+                <div class="flex md:flex-col items-center md:text-center gap-3">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
+                       :class="getStepIndex(ticketData.status) >= 3 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'bg-slate-200 text-slate-500'">
+                    <i class="fa-solid" :class="getStepIndex(ticketData.status) >= 3 ? 'fa-check' : 'fa-user-gear'"></i>
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-slate-900">3. Penugasan Unit</div>
+                    <div class="text-[11px] text-slate-500" x-text="ticketData.unitTujuan ? 'Unit IT/Sarpras' : 'Menunggu'"></div>
+                  </div>
+                </div>
+
+                <!-- Step 4: Tindakan Lapangan -->
+                <div class="flex md:flex-col items-center md:text-center gap-3">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
+                       :class="getStepIndex(ticketData.status) >= 4 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' : 'bg-slate-200 text-slate-500'">
+                    <i class="fa-solid" :class="getStepIndex(ticketData.status) >= 4 ? 'fa-screwdriver-wrench' : 'fa-clock'"></i>
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-slate-900">4. Penanganan</div>
+                    <div class="text-[11px] text-slate-500">Tindakan fisik/teknis</div>
+                  </div>
+                </div>
+
+                <!-- Step 5: Selesai Tuntas -->
+                <div class="flex md:flex-col items-center md:text-center gap-3">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
+                       :class="ticketData.status === 'selesai' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30' : 'bg-slate-200 text-slate-500'">
+                    <i class="fa-solid" :class="ticketData.status === 'selesai' ? 'fa-circle-check' : 'fa-flag-checkered'"></i>
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-slate-900">5. Selesai Tuntas</div>
+                    <div class="text-[11px] text-slate-500">Verifikasi penutupan</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Columns Grid: Detail Aduan vs Hasil Tindak Lanjut -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- Left Column (Detail Laporan Awal) -->
+          <div class="lg:col-span-5 space-y-6">
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+              <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
+                <i class="fa-solid fa-file-lines text-blue-600"></i> Rincian Pengaduan
+              </h3>
+
+              <div class="space-y-3 text-xs">
+                <div>
+                  <span class="text-slate-400 block mb-0.5">Kategori Masalah:</span>
+                  <span class="font-bold text-slate-800 text-sm" x-text="ticketData.kategori"></span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block mb-0.5">Jenis Pelapor:</span>
+                  <span class="font-semibold text-slate-800" x-text="ticketData.jenisPelapor"></span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block mb-0.5">Lokasi Spesifik:</span>
+                  <span class="font-semibold text-slate-800" x-text="ticketData.lokasi"></span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block mb-0.5">Deskripsi Lengkap:</span>
+                  <p class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 leading-relaxed font-normal" x-text="ticketData.uraian"></p>
+                </div>
+
+                <!-- Foto Bukti dari Pelapor -->
+                <div x-show="ticketData.buktiPelapor">
+                  <span class="text-slate-400 block mb-1">Bukti Foto dari Pelapor:</span>
+                  <a :href="ticketData.buktiPelapor" target="_blank" class="block relative group overflow-hidden rounded-xl border border-slate-200">
+                    <img :src="ticketData.buktiPelapor" alt="Bukti Pelapor" class="w-full h-44 object-cover group-hover:scale-105 transition duration-300">
+                    <div class="absolute inset-0 bg-navy-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold gap-1.5">
+                      <i class="fa-solid fa-magnifying-glass-plus"></i> Klik untuk perbesar
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kontak Satgas Sekolah Card -->
+            <div class="bg-gradient-to-br from-blue-900 to-navy-950 text-white rounded-2xl p-5 shadow-sm space-y-3">
+              <h4 class="font-bold text-sm flex items-center gap-2">
+                <i class="fa-solid fa-headset text-amber-400"></i> Layanan Bantuan Sekolah
+              </h4>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Jika terdapat kendala darurat yang butuh penanganan langsung, Anda dapat menghubungi pos piket SMKN 2 Karanganyar.
+              </p>
+              <div class="text-xs text-slate-200 pt-2 border-t border-white/10 space-y-1">
+                <p><i class="fa-solid fa-phone text-blue-300 mr-2"></i> Pos Piket: (0271) 494549</p>
+                <p><i class="fa-solid fa-location-dot text-amber-300 mr-2"></i> Gedung Kantor Utama Lantai 1</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column (Hasil Tindak Lanjut & Bukti Pengerjaan) -->
+          <div class="lg:col-span-7 space-y-6">
+
+            <!-- Card Hasil Tindak Lanjut -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-5">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <i class="fa-solid fa-clipboard-check text-emerald-600"></i> Hasil Tindak Lanjut Petugas
+                </h3>
+                <span class="text-xs font-bold text-slate-500" x-text="ticketData.unitTujuan ? 'Unit: ' + ticketData.unitTujuan : 'Menunggu Penugasan'"></span>
+              </div>
+
+              <!-- Case 1: Laporan Belum Diverifikasi / Belum Ada Petugas -->
+              <template x-if="!ticketData.petugas">
+                <div class="bg-slate-50 rounded-xl p-6 text-center border border-slate-200 space-y-2">
+                  <i class="fa-regular fa-clock text-amber-500 text-3xl mb-1"></i>
+                  <h4 class="font-bold text-sm text-slate-800">Menunggu Penugasan Unit oleh Admin</h4>
+                  <p class="text-xs text-slate-500 max-w-md mx-auto">Admin sedang memeriksa data laporan Anda dan akan segera menugaskan teknisi atau unit kerja yang berwenang.</p>
+                </div>
+              </template>
+
+              <!-- Case 2: Petugas Sudah Ditugaskan / Dalam Proses -->
+              <template x-if="ticketData.petugas">
+                <div class="space-y-4">
+                  <!-- Petugas Info Banner -->
+                  <div class="flex items-center gap-3.5 p-3.5 bg-blue-50/80 rounded-xl border border-blue-200">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
+                      <i class="fa-solid fa-user-gear"></i>
+                    </div>
+                    <div>
+                      <span class="text-[11px] text-blue-700 font-bold block uppercase tracking-wider">Petugas Penanggung Jawab</span>
+                      <span class="text-sm font-extrabold text-slate-900" x-text="ticketData.petugas"></span>
+                    </div>
+                    <div class="ml-auto text-right text-xs">
+                      <span class="text-slate-400 block text-[10px]">Target Selesai:</span>
+                      <span class="font-bold text-amber-700" x-text="ticketData.deadline || 'Sesuai SOP 2x24 Jam'"></span>
+                    </div>
+                  </div>
+
+                  <!-- Catatan Tindakan Petugas -->
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Catatan Tindakan Teknis / Solusi:</label>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-800 leading-relaxed"
+                         x-text="ticketData.catatanPetugas || 'Petugas sedang melakukan investigasi dan pemeriksaan fisik di lokasi kejadian.'">
+                    </div>
+                  </div>
+
+                  <!-- Foto Bukti Hasil Pengerjaan (Before / After Comparison) -->
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Dokumentasi Bukti Penyelesaian:</label>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <!-- Before / Laporan Awal -->
+                      <div class="space-y-1">
+                        <span class="text-[11px] font-bold text-slate-500 flex items-center gap-1.5">
+                          <span class="w-2 h-2 rounded-full bg-rose-500"></span> Kondisi Sebelum / Pelaporan:
+                        </span>
+                        <div class="rounded-xl overflow-hidden border border-slate-200 h-36 bg-slate-100 flex items-center justify-center">
+                          <template x-if="ticketData.buktiPelapor">
+                            <img :src="ticketData.buktiPelapor" alt="Sebelum" class="w-full h-full object-cover">
+                          </template>
+                          <template x-if="!ticketData.buktiPelapor">
+                            <span class="text-xs text-slate-400 italic">Tidak ada foto awal</span>
+                          </template>
+                        </div>
+                      </div>
+
+                      <!-- After / Hasil Tindakan -->
+                      <div class="space-y-1">
+                        <span class="text-[11px] font-bold text-emerald-700 flex items-center gap-1.5">
+                          <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Kondisi Sesudah Penanganan:
+                        </span>
+                        <div class="rounded-xl overflow-hidden border border-slate-200 h-36 bg-slate-100 flex items-center justify-center">
+                          <template x-if="ticketData.buktiPetugas">
+                            <img :src="ticketData.buktiPetugas" alt="Sesudah" class="w-full h-full object-cover">
+                          </template>
+                          <template x-if="!ticketData.buktiPetugas">
+                            <span class="text-xs text-slate-400 italic">Belum ada foto pengerjaan</span>
+                          </template>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Catatan Verifikasi Admin -->
+                  <div x-show="ticketData.catatanAdmin" class="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs">
+                    <span class="font-bold text-amber-900 block mb-0.5"><i class="fa-solid fa-circle-info mr-1"></i> Instruksi & Catatan Admin Sekolah:</span>
+                    <p class="text-amber-800" x-text="ticketData.catatanAdmin"></p>
+                  </div>
+                </div>
+              </template>
+            </div>
+
+            <!-- Card Feedback & Rating Pelapor (Jika status Selesai) -->
+            <div x-show="ticketData.status === 'selesai'" class="bg-white rounded-2xl p-6 border border-emerald-200 shadow-sm space-y-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg">
+                  <i class="fa-solid fa-star"></i>
+                </div>
+                <div>
+                  <h4 class="text-sm font-bold text-slate-900">Ulasan & Kepuasan Pelapor</h4>
+                  <p class="text-xs text-slate-500">Beri penilaian terhadap kecepatan dan kualitas penanganan tim SMKN 2 Karanganyar</p>
+                </div>
+              </div>
+
+              <!-- Sudah Diulas -->
+              <template x-if="ticketData.rating">
+                <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2">
+                  <div class="flex items-center gap-1 text-amber-400 text-base">
+                    <template x-for="i in 5" :key="i">
+                      <i class="fa-solid fa-star" :class="i <= ticketData.rating ? 'text-amber-400' : 'text-slate-300'"></i>
+                    </template>
+                    <span class="text-xs font-bold text-slate-700 ml-2" x-text="ticketData.rating + ' / 5 Bintang'"></span>
+                  </div>
+                  <p class="text-xs text-slate-700 italic" x-text="'“' + (ticketData.ulasanPelapor || 'Penanganan sangat memuaskan.') + '”'"></p>
+                </div>
+              </template>
+
+              <!-- Belum Diulas (Form Feedback) -->
+              <template x-if="!ticketData.rating">
+                <form @submit.prevent="submitFeedback()" class="space-y-3 pt-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-700 mr-2">Beri Nilai:</span>
+                    <template x-for="star in [1,2,3,4,5]" :key="star">
+                      <button type="button" @click="feedbackRating = star" class="text-2xl transition hover:scale-110" :class="feedbackRating >= star ? 'text-amber-400' : 'text-slate-300'">
+                        ★
+                      </button>
+                    </template>
+                  </div>
+                  <textarea 
+                    x-model="feedbackText" 
+                    rows="2" 
+                    placeholder="Tulis ulasan Anda terkait hasil perbaikan petugas..." 
+                    class="w-full p-3 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500 bg-slate-50"></textarea>
+                  <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition">
+                    Kirim Penilaian Kepuasan
+                  </button>
+                </form>
+              </template>
+            </div>
+
+            <!-- Audit Trail Timeline (Riwayat Aktivitas Lengkap) -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+              <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-timeline text-slate-400"></i> Kronologi Penanganan (Audit Log)
+              </h4>
+
+              <div class="relative pl-6 space-y-5 border-l-2 border-slate-200 ml-2">
+                <template x-for="(log, idx) in ticketData.riwayat" :key="idx">
+                  <div class="relative">
+                    <!-- Dot -->
+                    <span class="absolute -left-[31px] top-1 w-3.5 h-3.5 rounded-full border-2 border-white bg-blue-600 shadow-sm"></span>
+                    <div class="flex items-center justify-between text-xs mb-1">
+                      <span class="font-bold text-slate-900" x-text="log.aksi"></span>
+                      <span class="text-[11px] text-slate-400 font-mono" x-text="log.waktu"></span>
+                    </div>
+                    <div class="text-[11px] text-slate-500 font-medium mb-1" x-text="'Oleh: ' + log.aktor"></div>
+                    <p class="text-xs text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100" x-text="log.keterangan"></p>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </template>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>&copy; 2026 SMK Negeri 2 Karanganyar • SIADU (Sistem Informasi Pengaduan & Aspirasi)</p>
+      <div class="flex items-center gap-3">
+        <a href="admin-dashboard.html" class="text-slate-500 hover:text-blue-700">Panel Admin</a>
+        <span>•</span>
+        <a href="petugas-dashboard.html" class="text-slate-500 hover:text-emerald-700">Panel Petugas</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function lacakApp() {
+      return {
+        ticketQuery: '',
+        ticketData: null,
+        ticketNotFound: false,
+        feedbackRating: 5,
+        feedbackText: '',
+
+        init() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const t = urlParams.get('ticket');
+          if (t) {
+            this.ticketQuery = t;
+            this.searchTicket();
+          } else {
+            // Default load sample ticket for immediate review
+            this.loadTicket('TKT-2026-0482');
+          }
+        },
+
+        searchTicket() {
+          if (!this.ticketQuery) return;
+          const found = window.PengaduanDB.getByTicket(this.ticketQuery);
+          if (found) {
+            this.ticketData = found;
+            this.ticketNotFound = false;
+          } else {
+            this.ticketData = null;
+            this.ticketNotFound = true;
+          }
+        },
+
+        loadTicket(id) {
+          this.ticketQuery = id;
+          this.searchTicket();
+        },
+
+        getStepIndex(status) {
+          const map = {
+            masuk: 1,
+            terverifikasi: 2,
+            dalam_proses: 4,
+            menunggu_konfirmasi: 4,
+            selesai: 5
+          };
+          return map[status] || 1;
+        },
+
+        formatStatus(st) {
+          const dict = {
+            masuk: 'Menunggu Verifikasi',
+            terverifikasi: 'Terverifikasi (Ditugaskan)',
+            dalam_proses: 'Sedang Ditangani Petugas',
+            menunggu_konfirmasi: 'Menunggu Konfirmasi Selesai',
+            selesai: 'Selesai Tuntas',
+            ditolak: 'Ditolak'
+          };
+          return dict[st] || st;
+        },
+
+        submitFeedback() {
+          if (!this.ticketData) return;
+          window.PengaduanDB.giveFeedback(this.ticketData.id, this.feedbackRating, this.feedbackText);
+          this.ticketData = window.PengaduanDB.getByTicket(this.ticketData.id);
+        }
+      }
+    }
+  </script>
+</body>
+</html>

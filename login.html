@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Portal - SIADU SMKN 2 Karanganyar</title>
+  <meta name="description" content="Portal Masuk SIADU - Layanan Pengaduan & Aspirasi SMK Negeri 2 Karanganyar">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#0a1120',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased font-sans selection:bg-blue-600 selection:text-white min-h-screen flex flex-col justify-between" x-data="loginApp()">
+
+  <!-- Simple Header -->
+  <header class="py-4 px-6 border-b border-slate-200 bg-white">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <img 
+          src="https://smkn2kra.sch.id/images/logo-smkn2kra.png" 
+          alt="Logo SMKN 2 Kra" 
+          class="h-9 w-auto"
+          onerror="this.onerror=null; this.src='https://placehold.co/120x120/1e293b/ffffff?text=SMKN+2+KRA';"
+        >
+        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider hidden sm:block">SMK Negeri 2 Karanganyar</span>
+      </a>
+
+      <a href="index.html" class="text-xs font-semibold text-slate-600 hover:text-blue-700 flex items-center gap-1.5">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke Beranda
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Login Card -->
+  <main class="flex-1 flex items-center justify-center p-4 py-10">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+      
+      <!-- Top Header Card -->
+      <div class="bg-[#0f1f38] text-white p-7 text-center relative">
+        <img 
+          src="https://smkn2kra.sch.id/images/logo-smkn2kra.png" 
+          alt="Logo SMKN 2 Kra" 
+          class="h-16 w-auto mx-auto mb-3"
+          onerror="this.onerror=null; this.src='https://placehold.co/120x120/1e293b/ffffff?text=SMKN+2+KRA';"
+        >
+        <h2 class="text-xl font-extrabold tracking-tight">Portal Masuk SIADU</h2>
+        <p class="text-xs text-blue-200 mt-1">Sistem Informasi Pengaduan & Aspirasi SMK Negeri 2 Karanganyar</p>
+      </div>
+
+      <!-- Role Selector Tabs -->
+      <div class="flex border-b border-slate-200 bg-slate-50 text-xs font-bold">
+        <button 
+          @click="selectRole('admin')" 
+          class="flex-1 py-3 px-2 border-b-2 transition flex items-center justify-center gap-1.5"
+          :class="role === 'admin' ? 'border-blue-600 text-blue-700 bg-white' : 'border-transparent text-slate-500 hover:text-slate-800'">
+          <i class="fa-solid fa-shield-halved text-blue-600"></i> Admin
+        </button>
+        <button 
+          @click="selectRole('petugas')" 
+          class="flex-1 py-3 px-2 border-b-2 transition flex items-center justify-center gap-1.5"
+          :class="role === 'petugas' ? 'border-emerald-600 text-emerald-700 bg-white' : 'border-transparent text-slate-500 hover:text-slate-800'">
+          <i class="fa-solid fa-wrench text-emerald-600"></i> Petugas
+        </button>
+        <button 
+          @click="selectRole('pelapor')" 
+          class="flex-1 py-3 px-2 border-b-2 transition flex items-center justify-center gap-1.5"
+          :class="role === 'pelapor' ? 'border-amber-500 text-amber-700 bg-white' : 'border-transparent text-slate-500 hover:text-slate-800'">
+          <i class="fa-solid fa-user text-amber-600"></i> Pelapor
+        </button>
+      </div>
+
+      <!-- Login Form Body -->
+      <div class="p-6 sm:p-7 space-y-5">
+        
+        <!-- Role Info Banner -->
+        <div class="p-3 rounded-xl text-xs flex items-center gap-2.5"
+          :class="{
+            'bg-blue-50 text-blue-800 border border-blue-200': role === 'admin',
+            'bg-emerald-50 text-emerald-800 border border-emerald-200': role === 'petugas',
+            'bg-amber-50 text-amber-800 border border-amber-200': role === 'pelapor'
+          }">
+          <i class="fa-solid" :class="{
+            'fa-shield-halved text-blue-600': role === 'admin',
+            'fa-screwdriver-wrench text-emerald-600': role === 'petugas',
+            'fa-user-graduate text-amber-600': role === 'pelapor'
+          }"></i>
+          <span x-text="roleDescriptions[role]"></span>
+        </div>
+
+        <form @submit.prevent="login()" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email / NIP / NISN</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                <i class="fa-solid fa-envelope text-xs"></i>
+              </span>
+              <input 
+                type="text" 
+                x-model="credentials.email" 
+                class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-600 bg-slate-50"
+                required
+              >
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Kata Sandi</label>
+              <a href="#" class="text-[11px] text-blue-600 hover:underline">Lupa sandi?</a>
+            </div>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                <i class="fa-solid fa-lock text-xs"></i>
+              </span>
+              <input 
+                type="password" 
+                x-model="credentials.password" 
+                class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-blue-600 bg-slate-50"
+                required
+              >
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-xs">
+            <label class="flex items-center gap-2 cursor-pointer text-slate-600">
+              <input type="checkbox" checked class="rounded text-blue-600 focus:ring-blue-500">
+              <span>Ingat saya di perangkat ini</span>
+            </label>
+          </div>
+
+          <button 
+            type="submit" 
+            :disabled="isLoading"
+            class="w-full py-3 rounded-xl font-bold text-xs text-white shadow-md transition flex items-center justify-center gap-2"
+            :class="{
+              'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20': role === 'admin',
+              'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20': role === 'petugas',
+              'bg-amber-600 hover:bg-amber-700 shadow-amber-500/20': role === 'pelapor'
+            }">
+            <template x-if="isLoading">
+              <span class="flex items-center gap-2"><i class="fa-solid fa-spinner fa-spin"></i> Memverifikasi Kredensial...</span>
+            </template>
+            <template x-if="!isLoading">
+              <span class="flex items-center gap-2"><i class="fa-solid fa-right-to-bracket"></i> Masuk Sekarang</span>
+            </template>
+          </button>
+        </form>
+
+        <!-- Quick 1-Click Demo Buttons -->
+        <div class="pt-4 border-t border-slate-200">
+          <span class="text-xs text-slate-400 block mb-2 font-medium text-center">Akses Cepat Pengujian (1-Klik):</span>
+          <div class="grid grid-cols-2 gap-2">
+            <button @click="quickLogin('admin')" class="p-2 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-shield-halved text-xs"></i> Akun Admin
+            </button>
+            <button @click="quickLogin('petugas')" class="p-2 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-screwdriver-wrench text-xs"></i> Akun Petugas
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-4 text-center text-xs text-slate-400 border-t border-slate-200 bg-white">
+    &copy; 2026 SMK Negeri 2 Karanganyar • SIADU Portal Layanan Pengaduan Resmi
+  </footer>
+
+  <script>
+    function loginApp() {
+      return {
+        role: 'admin',
+        isLoading: false,
+        credentials: {
+          email: 'admin.pengaduan@smkn2kra.sch.id',
+          password: '••••••••'
+        },
+
+        roleDescriptions: {
+          admin: 'Alur Admin SIADU: Verifikasi laporan masuk, tetapkan urgensi & unit, pantau tenggat.',
+          petugas: 'Alur Petugas SIADU: Lihat penugasan teknis, laksanakan perbaikan, unggah bukti.',
+          pelapor: 'Alur Pelapor SIADU: Warga sekolah dapat langsung membuat laporan atau melacak tiket.'
+        },
+
+        selectRole(r) {
+          this.role = r;
+          if (r === 'admin') {
+            this.credentials.email = 'admin.pengaduan@smkn2kra.sch.id';
+          } else if (r === 'petugas') {
+            this.credentials.email = 'joko.teknisi@smkn2kra.sch.id';
+          } else {
+            this.credentials.email = 'siswa@smkn2kra.sch.id';
+          }
+        },
+
+        quickLogin(r) {
+          this.selectRole(r);
+          this.login();
+        },
+
+        login() {
+          this.isLoading = true;
+          setTimeout(() => {
+            this.isLoading = false;
+            if (this.role === 'admin') {
+              window.location.href = 'admin-dashboard.html';
+            } else if (this.role === 'petugas') {
+              window.location.href = 'petugas-dashboard.html';
+            } else {
+              window.location.href = 'buat-pengaduan.html';
+            }
+          }, 450);
+        }
+      }
+    }
+  </script>
+</body>
+</html>

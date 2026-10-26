@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIADU - Sistem Informasi Pengaduan & Aspirasi SMKN 2 Karanganyar</title>
+  <meta name="description" content="SIADU (Sistem Informasi Pengaduan & Aspirasi) Warga Sekolah SMK Negeri 2 Karanganyar. Cepat, transparan, akuntabel, dan terintegrasi.">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+
+  <!-- Data Store Mockup -->
+  <script src="pengaduan-store.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              50: '#f0f5fc',
+              100: '#e1ecf8',
+              500: '#1d4ed8',
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#0b1120',
+            },
+            brand: {
+              gold: '#f59e0b',
+              blue: '#2563eb',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans selection:bg-blue-600 selection:text-white" x-data="homeApp()">
+
+  <!-- Top Announcement Bar -->
+  <div class="bg-navy-950 text-slate-300 text-xs py-2 px-4 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-600 text-white uppercase tracking-wider">Resmi</span>
+        <span>Portal Layanan Aspirasi & Pengaduan Sarana, Akademik, dan Perlindungan SMKN 2 Karanganyar</span>
+      </div>
+      <div class="flex items-center gap-4 text-slate-400">
+        <a href="login.html" class="hover:text-white transition flex items-center gap-1.5 font-medium">
+          <i class="fa-solid fa-lock text-xs text-amber-400"></i> Portal Staf & Admin
+        </a>
+        <span class="text-slate-700">|</span>
+        <span class="flex items-center gap-1"><i class="fa-solid fa-phone text-[11px] text-emerald-400"></i> (0271) 494549</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Brand & School Logo -->
+        <a href="index.html" class="flex items-center gap-3.5 group">
+          <img 
+            src="https://smkn2kra.sch.id/images/logo-smkn2kra.png" 
+            alt="Logo SMKN 2 Karanganyar" 
+            class="h-12 w-auto object-contain transition-transform group-hover:scale-105"
+            onerror="this.onerror=null; this.src='https://placehold.co/120x120/1e293b/ffffff?text=SMKN+2+KRA';"
+          >
+          <div class="flex flex-col">
+            <span class="text-xs font-semibold tracking-wider text-blue-700 uppercase">SMK Negeri 2 Karanganyar</span>
+            <span class="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-1.5">
+              SIADU <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">PENGADUAN</span>
+            </span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-1 text-sm font-semibold text-slate-600">
+          <a href="index.html" class="px-3.5 py-2 rounded-lg text-blue-600 bg-blue-50/80 transition">Beranda</a>
+          <a href="buat-pengaduan.html" class="px-3.5 py-2 rounded-lg hover:text-blue-600 hover:bg-slate-100 transition">Buat Pengaduan</a>
+          <a href="lacak-pengaduan.html" class="px-3.5 py-2 rounded-lg hover:text-blue-600 hover:bg-slate-100 transition">Lacak Tiket</a>
+          <div class="h-4 w-[1px] bg-slate-300 mx-2"></div>
+          <a href="admin-dashboard.html" class="px-3 py-2 rounded-lg text-slate-700 hover:text-blue-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-blue-600"></i> Panel Admin
+          </a>
+          <a href="petugas-dashboard.html" class="px-3 py-2 rounded-lg text-slate-700 hover:text-emerald-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-wrench text-emerald-600"></i> Panel Petugas
+          </a>
+        </nav>
+
+        <!-- CTA & Quick Action -->
+        <div class="hidden lg:flex items-center gap-3">
+          <a href="buat-pengaduan.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition transform active:scale-95">
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+            Buat Laporan Baru
+          </a>
+        </div>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button @click="mobileMenu = !mobileMenu" type="button" class="md:hidden p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-none">
+          <i class="fa-solid" :class="mobileMenu ? 'fa-xmark text-xl' : 'fa-bars text-xl'"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown -->
+    <div x-show="mobileMenu" x-collapse class="md:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-5 space-y-2 shadow-xl">
+      <a href="index.html" class="block px-3 py-2 rounded-lg font-bold text-blue-600 bg-blue-50">Beranda</a>
+      <a href="buat-pengaduan.html" class="block px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100">Buat Pengaduan</a>
+      <a href="lacak-pengaduan.html" class="block px-3 py-2 rounded-lg font-medium text-slate-700 hover:bg-slate-100">Lacak Tiket</a>
+      <div class="pt-2 border-t border-slate-200">
+        <a href="admin-dashboard.html" class="block px-3 py-2 rounded-lg font-semibold text-slate-800 hover:bg-slate-100">
+          <i class="fa-solid fa-shield-halved text-blue-600 mr-2"></i> Panel Admin Sekolah
+        </a>
+        <a href="petugas-dashboard.html" class="block px-3 py-2 rounded-lg font-semibold text-slate-800 hover:bg-slate-100">
+          <i class="fa-solid fa-wrench text-emerald-600 mr-2"></i> Panel Petugas Lapangan
+        </a>
+        <a href="login.html" class="block px-3 py-2 rounded-lg font-semibold text-slate-800 hover:bg-slate-100">
+          <i class="fa-solid fa-right-to-bracket text-amber-500 mr-2"></i> Masuk / Ganti Akun
+        </a>
+      </div>
+      <div class="pt-3">
+        <a href="buat-pengaduan.html" class="w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-white bg-blue-600 shadow-md">
+          <i class="fa-solid fa-paper-plane"></i> Tulis Laporan Sekarang
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden bg-gradient-to-b from-blue-900 via-navy-900 to-navy-950 text-white pt-14 pb-24">
+    <!-- Glow and Grid Decor -->
+    <div class="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none"></div>
+    <div class="absolute -top-32 -right-32 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Hero Text -->
+        <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-blue-200 text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Layanan Pengaduan & Aspirasi Aktif 24 Jam
+          </div>
+
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight sm:leading-tight">
+            Suarakan Kendala, Kami Tindaklanjuti Demi 
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-amber-300 to-yellow-400">SMKN 2 Karanganyar</span> Lebih Baik
+          </h1>
+
+          <p class="text-slate-300 text-base sm:text-lg max-w-2xl font-normal leading-relaxed">
+            Laporkan masalah sarana prasarana, fasilitas laboratorium, kendala akademik, hingga perlindungan warga sekolah. Dikelola transparan oleh admin dan teknisi ahli.
+          </p>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-2">
+            <a href="buat-pengaduan.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl font-bold text-base text-navy-950 bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 shadow-xl shadow-amber-500/25 transition transform hover:-translate-y-0.5 active:translate-y-0">
+              <i class="fa-solid fa-pen-to-square text-navy-950"></i>
+              Buat Pengaduan Sekarang
+            </a>
+            <a href="lacak-pengaduan.html" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-base text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition">
+              <i class="fa-solid fa-magnifying-glass text-slate-300"></i>
+              Lacak Status Tiket
+            </a>
+          </div>
+
+          <!-- Quick Stats Pill -->
+          <div class="pt-6 grid grid-cols-3 gap-4 border-t border-white/10">
+            <div>
+              <div class="text-2xl sm:text-3xl font-extrabold text-white" x-text="stats.total">5</div>
+              <div class="text-xs text-slate-400 font-medium">Total Aduan Masuk</div>
+            </div>
+            <div>
+              <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400" x-text="stats.selesai">2</div>
+              <div class="text-xs text-slate-400 font-medium">Terselesaikan</div>
+            </div>
+            <div>
+              <div class="text-2xl sm:text-3xl font-extrabold text-amber-400">98.5%</div>
+              <div class="text-xs text-slate-400 font-medium">Tingkat Kepuasan</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Card: Quick Search & Tracking -->
+        <div class="lg:col-span-5">
+          <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 text-slate-800 border border-slate-100">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                <i class="fa-solid fa-ticket"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-slate-900">Cek Status Pengaduan Anda</h3>
+                <p class="text-xs text-slate-500">Masukkan nomor tiket pengaduan yang Anda miliki</p>
+              </div>
+            </div>
+
+            <!-- Form Lacak Cepat -->
+            <form @submit.prevent="lacakCepat()" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Nomor Tiket Laporan</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 pointer-events-none">
+                    <i class="fa-solid fa-hashtag text-sm"></i>
+                  </span>
+                  <input 
+                    type="text" 
+                    x-model="quickTicketInput" 
+                    placeholder="Contoh: TKT-2026-0482" 
+                    class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 bg-slate-50 uppercase"
+                    required
+                  >
+                </div>
+              </div>
+
+              <button type="submit" class="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-blue-600 hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-md shadow-blue-500/20">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Lacak Progres Laporan
+              </button>
+            </form>
+
+            <!-- Sample Tickets to Test Immediately -->
+            <div class="mt-6 pt-5 border-t border-slate-200">
+              <span class="text-xs text-slate-500 font-medium block mb-2">Coba nomor tiket simulasi:</span>
+              <div class="flex flex-wrap gap-2">
+                <button @click="testTicket('TKT-2026-0482')" class="text-xs px-2.5 py-1 rounded-md bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 font-mono transition border border-slate-200">
+                  #TKT-2026-0482 (Proses)
+                </button>
+                <button @click="testTicket('TKT-2026-0481')" class="text-xs px-2.5 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-mono transition border border-emerald-200">
+                  #TKT-2026-0481 (Selesai)
+                </button>
+                <button @click="testTicket('TKT-2026-0483')" class="text-xs px-2.5 py-1 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-700 font-mono transition border border-amber-200">
+                  #TKT-2026-0483 (Baru)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive 3-Workflow Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-bold text-blue-600 tracking-wider uppercase bg-blue-50 px-3 py-1 rounded-full">Alur Terintegrasi</span>
+        <h2 class="text-3xl font-extrabold text-slate-900 mt-2">Bagaimana Sistem Pengaduan Bekerja?</h2>
+        <p class="text-slate-600 mt-2 text-sm sm:text-base">Kolaborasi transparan antara Pelapor (Warga Sekolah), Admin Verifikator, dan Petugas Penanganan Lapangan di SMKN 2 Karanganyar.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Card 1: Alur Pelapor -->
+        <div class="relative bg-gradient-to-b from-slate-50 to-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition group">
+          <div class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xl mb-5 shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-user-pen"></i>
+          </div>
+          <div class="inline-block px-2.5 py-1 rounded text-[11px] font-bold bg-blue-100 text-blue-700 mb-2">ALUR A • PELAPOR</div>
+          <h3 class="text-lg font-bold text-slate-900 mb-3">Warga Sekolah & Siswa</h3>
+          
+          <ul class="space-y-3 text-xs sm:text-sm text-slate-600 mb-6">
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</span>
+              <span>Buka aplikasi & pilih <strong>Buat Pengaduan</strong></span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">2</span>
+              <span>Isi formulir kategori, lokasi, uraian, & urgensi</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">3</span>
+              <span>Kirim & terima <strong>Nomor Tiket Unik</strong></span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">4</span>
+              <span>Lacak perkembangan real-time & lihat hasil tindak lanjut</span>
+            </li>
+          </ul>
+
+          <div class="pt-4 border-t border-slate-100 flex items-center gap-2">
+            <a href="buat-pengaduan.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800">
+              Coba Formulir Pelapor <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 2: Alur Admin -->
+        <div class="relative bg-gradient-to-b from-slate-50 to-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition group">
+          <div class="w-12 h-12 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center font-bold text-xl mb-5 shadow-lg shadow-slate-900/30 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="inline-block px-2.5 py-1 rounded text-[11px] font-bold bg-slate-200 text-slate-800 mb-2">ALUR B • ADMIN</div>
+          <h3 class="text-lg font-bold text-slate-900 mb-3">Admin & Tim Verifikator</h3>
+          
+          <ul class="space-y-3 text-xs sm:text-sm text-slate-600 mb-6">
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</span>
+              <span>Login & pantau daftar <strong>laporan masuk</strong></span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">2</span>
+              <span>Verifikasi keabsahan isi laporan & bukti</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">3</span>
+              <span>Tetapkan kategori definitif & tingkat urgensi</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">4</span>
+              <span>Tugaskan ke unit tepat, pantau tenggat SLA, & periksa kelengkapan penyelesaian</span>
+            </li>
+          </ul>
+
+          <div class="pt-4 border-t border-slate-100 flex items-center gap-2">
+            <a href="admin-dashboard.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 hover:text-blue-700">
+              Buka Dashboard Admin <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 3: Alur Petugas -->
+        <div class="relative bg-gradient-to-b from-slate-50 to-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition group">
+          <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xl mb-5 shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+          </div>
+          <div class="inline-block px-2.5 py-1 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 mb-2">ALUR C • PETUGAS</div>
+          <h3 class="text-lg font-bold text-slate-900 mb-3">Teknisi & Petugas Lapangan</h3>
+          
+          <ul class="space-y-3 text-xs sm:text-sm text-slate-600 mb-6">
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</span>
+              <span>Login & lihat <strong>daftar tugas yang diberikan</strong></span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">2</span>
+              <span>Lakukan pemeriksaan atau tindakan fisik di lokasi</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">3</span>
+              <span>Catat hasil penanganan & suku cadang</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">4</span>
+              <span>Unggah bukti foto pengerjaan & <strong>ajukan status selesai</strong></span>
+            </li>
+          </ul>
+
+          <div class="pt-4 border-t border-slate-100 flex items-center gap-2">
+            <a href="petugas-dashboard.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-900">
+              Buka Dashboard Petugas <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kategori Pengaduan Sekolah -->
+  <section class="py-16 bg-slate-100/70 border-y border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+        <div>
+          <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Ruang Lingkup</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">5 Kategori Layanan Pengaduan</h2>
+          <p class="text-slate-600 text-sm mt-1">Sesuai dengan instrumen baku penanganan keluhan di SMK Negeri 2 Karanganyar</p>
+        </div>
+        <a href="buat-pengaduan.html" class="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-800">
+          Mulai Isi Formulir <i class="fa-solid fa-chevron-right text-xs"></i>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <!-- 1 -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-400 transition">
+          <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-lg mb-3">
+            <i class="fa-solid fa-building-circle-check"></i>
+          </div>
+          <h4 class="font-bold text-slate-900 text-sm mb-1.5">Sarana & Prasarana</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">Kerusakan alat lab komputer, mesin bengkel, kelistrikan, ruang kelas, AC, meja, kursi, dan sanitasi.</p>
+        </div>
+        <!-- 2 -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-400 transition">
+          <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg mb-3">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <h4 class="font-bold text-slate-900 text-sm mb-1.5">Pembelajaran & Akademik</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">Jadwal pelajaran, praktikum kejuruan, perpustakaan digital, modul ajar, dan ujian sekolah.</p>
+        </div>
+        <!-- 3 -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-400 transition">
+          <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg mb-3">
+            <i class="fa-solid fa-file-invoice"></i>
+          </div>
+          <h4 class="font-bold text-slate-900 text-sm mb-1.5">Layanan Administrasi</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">Pelayanan Tata Usaha, legalisir ijazah, surat keterangan siswa, kartu pelajar, dan keuangan.</p>
+        </div>
+        <!-- 4 -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-400 transition">
+          <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-lg mb-3">
+            <i class="fa-solid fa-hand-holding-heart"></i>
+          </div>
+          <h4 class="font-bold text-slate-900 text-sm mb-1.5">Perlindungan Warga</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">Pencegahan bullying, keamanan lingkungan sekolah, ketertiban gerbang, dan konseling BK.</p>
+        </div>
+        <!-- 5 -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-400 transition">
+          <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-lg mb-3">
+            <i class="fa-solid fa-lightbulb"></i>
+          </div>
+          <h4 class="font-bold text-slate-900 text-sm mb-1.5">Saran & Aspirasi</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">Ide inovasi fasilitas, kegiatan ekstrakurikuler, penghijauan, kebersihan kantin, dan kemajuan sekolah.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Transparansi Aduan Terkini -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+        <div>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Live Tracking
+          </span>
+          <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Transparansi Laporan Terkini</h3>
+          <p class="text-slate-500 text-xs sm:text-sm">Pantauan terbuka progres penanganan keluhan warga SMK Negeri 2 Karanganyar</p>
+        </div>
+        <a href="lacak-pengaduan.html" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition flex items-center gap-2">
+          <i class="fa-solid fa-list-check"></i> Lihat Semua Tiket
+        </a>
+      </div>
+
+      <!-- Recent Tickets Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <template x-for="item in recentReports" :key="item.id">
+          <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 hover:border-blue-300 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="font-mono text-xs font-bold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded" x-text="'#' + item.id"></span>
+                <span 
+                  class="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                  :class="{
+                    'bg-amber-100 text-amber-800': item.status === 'masuk',
+                    'bg-blue-100 text-blue-800': item.status === 'terverifikasi',
+                    'bg-purple-100 text-purple-800': item.status === 'dalam_proses',
+                    'bg-teal-100 text-teal-800': item.status === 'menunggu_konfirmasi',
+                    'bg-emerald-100 text-emerald-800': item.status === 'selesai'
+                  }"
+                  x-text="formatStatus(item.status)"
+                ></span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm line-clamp-2 mb-2" x-text="item.judul"></h4>
+              <p class="text-xs text-slate-500 mb-3 flex items-center gap-1.5">
+                <i class="fa-solid fa-location-dot text-slate-400"></i>
+                <span class="truncate" x-text="item.lokasi || 'SMKN 2 Kra'"></span>
+              </p>
+              <div class="text-[11px] text-slate-500 bg-white p-2 rounded border border-slate-200 line-clamp-2" x-text="item.uraian"></div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-xs">
+              <span class="text-slate-400 font-medium" x-text="item.tanggalLapor"></span>
+              <a :href="'lacak-pengaduan.html?ticket=' + item.id" class="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1">
+                Lacak <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </a>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Box -->
+  <section class="py-14 bg-navy-900 text-white">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+      <h2 class="text-2xl sm:text-3xl font-black">Punya Masalah atau Keluhan di Sekolah Hari Ini?</h2>
+      <p class="text-slate-300 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
+        Jangan biarkan fasilitas yang rusak menghambat proses belajar mengajar. Laporkan secara mudah dalam 2 menit, admin dan petugas kami segera bertindak.
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+        <a href="buat-pengaduan.html" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 text-navy-950 font-bold text-sm shadow-lg hover:shadow-amber-500/30 transition">
+          <i class="fa-solid fa-plus-circle mr-1.5"></i> Buat Laporan Pengaduan
+        </a>
+        <a href="login.html" class="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-sm transition">
+          <i class="fa-solid fa-user-shield mr-1.5"></i> Portal Admin & Petugas
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-navy-950 text-slate-400 text-xs py-12 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+        <!-- Col 1: Identity -->
+        <div class="space-y-4 md:col-span-2">
+          <div class="flex items-center gap-3">
+            <img 
+              src="https://smkn2kra.sch.id/images/logo-smkn2kra.png" 
+              alt="Logo SMKN 2 Karanganyar" 
+              class="h-10 w-auto"
+              onerror="this.onerror=null; this.src='https://placehold.co/120x120/1e293b/ffffff?text=SMKN+2+KRA';"
+            >
+            <div>
+              <div class="text-white font-extrabold text-base">SMK Negeri 2 Karanganyar</div>
+              <div class="text-slate-400 text-[11px]">Sistem Layanan Aspirasi & Pengaduan Terpadu</div>
+            </div>
+          </div>
+          <p class="text-slate-400 text-xs leading-relaxed max-w-md">
+            Wadah resmi penyampaian aspirasi dan aduan fasilitas sekolah untuk mewujudkan lingkungan pendidikan kejuruan yang unggul, aman, dan berintegritas.
+          </p>
+          <div class="text-slate-400 text-[11px] space-y-1">
+            <p><i class="fa-solid fa-location-dot text-amber-400 mr-2"></i> Jl. Yos Sudarso, Janggungan, Changkang, Karanganyar, Jawa Tengah 57716</p>
+            <p><i class="fa-solid fa-phone text-blue-400 mr-2"></i> (0271) 494549 | Email: smkn2kra@yahoo.co.id</p>
+          </div>
+        </div>
+
+        <!-- Col 2: Navigasi Cepat -->
+        <div>
+          <h4 class="text-white font-bold text-sm mb-3">Navigasi Halaman</h4>
+          <ul class="space-y-2">
+            <li><a href="index.html" class="hover:text-white transition">Beranda Utama</a></li>
+            <li><a href="buat-pengaduan.html" class="hover:text-white transition">Formulir Pengaduan (Pelapor)</a></li>
+            <li><a href="lacak-pengaduan.html" class="hover:text-white transition">Lacak Pengaduan & Hasil</a></li>
+            <li><a href="admin-dashboard.html" class="hover:text-white transition">Dashboard Verifikasi Admin</a></li>
+            <li><a href="petugas-dashboard.html" class="hover:text-white transition">Dashboard Tindakan Petugas</a></li>
+            <li><a href="login.html" class="hover:text-white transition">Portal Masuk / Login</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Jurusan & Program -->
+        <div>
+          <h4 class="text-white font-bold text-sm mb-3">Konsentrasi Keahlian</h4>
+          <ul class="space-y-1.5 text-slate-400">
+            <li>• Rekayasa Perangkat Lunak (RPL)</li>
+            <li>• Teknik Jaringan Komputer (TKJ)</li>
+            <li>• Teknik Pemesinan (TP)</li>
+            <li>• Teknik Kendaraan Ringan (TKR)</li>
+            <li>• Teknik Otomasi Industri (TOI)</li>
+            <li>• Tata Busana (TB)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
+        <p>&copy; 2026 SMK Negeri 2 Karanganyar. Seluruh hak cipta dilindungi undang-undang.</p>
+        <p class="text-slate-400">SIADU (Sistem Informasi Pengaduan) • Tailwind CSS & Alpine.js Standalone Prototype</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function homeApp() {
+      return {
+        mobileMenu: false,
+        quickTicketInput: '',
+        recentReports: [],
+        stats: {
+          total: 0,
+          selesai: 0,
+          proses: 0
+        },
+
+        init() {
+          const all = window.PengaduanDB.getAll();
+          this.recentReports = all.slice(0, 3);
+          this.stats.total = all.length;
+          this.stats.selesai = all.filter(r => r.status === 'selesai').length;
+          this.stats.proses = all.filter(r => ['dalam_proses', 'terverifikasi', 'menunggu_konfirmasi'].includes(r.status)).length;
+        },
+
+        lacakCepat() {
+          if (!this.quickTicketInput) return;
+          window.location.href = `lacak-pengaduan.html?ticket=${encodeURIComponent(this.quickTicketInput.trim())}`;
+        },
+
+        testTicket(id) {
+          window.location.href = `lacak-pengaduan.html?ticket=${encodeURIComponent(id)}`;
+        },
+
+        formatStatus(st) {
+          const dict = {
+            masuk: 'Menunggu Verifikasi',
+            terverifikasi: 'Terverifikasi',
+            dalam_proses: 'Sedang Ditangani',
+            menunggu_konfirmasi: 'Menunggu Konfirmasi',
+            selesai: 'Selesai Tuntas',
+            ditolak: 'Ditolak'
+          };
+          return dict[st] || st;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

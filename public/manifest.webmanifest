@@ -1,0 +1,37 @@
+{
+  "name": "SIADU - Sistem Pengaduan SMKN 2 Karanganyar",
+  "short_name": "SIADU",
+  "description": "Layanan Pengaduan & Aspirasi Siswa, Guru, dan Warga Sekolah SMKN 2 Karanganyar",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://smkn2kra.sch.id/images/logo-smkn2kra.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://smkn2kra.sch.id/images/logo-smkn2kra.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Buat Pengaduan Baru",
+      "url": "/buat-pengaduan",
+      "description": "Formulir cepat pengaduan baru"
+    },
+    {
+      "name": "Lacak Tiket Aduan",
+      "url": "/lacak-pengaduan",
+      "description": "Cek perkembangan status penanganan"
+    }
+  ]
+}
